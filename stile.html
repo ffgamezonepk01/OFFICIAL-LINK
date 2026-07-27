@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>FF GameZone PK - Tournaments</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root { 
+            --accent: #ffcc00; 
+            --bg: #0d0d0d; 
+            --card: #1a1a1a; 
+            --success: #2ecc71; 
+            --danger: #ff4d4d; 
+            --special: #e67e22; 
+            --blue-tag: #3498db;
+            --local: #008cff;
+        }
+        
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            outline: none !important; 
+        }
+
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            font-family: 'Segoe UI', sans-serif; 
+            padding: 70px 15px 80px 15px; 
+            margin: 0; 
+        }
+
+        /* --- LOADER STYLE --- */
+        #globalLoaderEl {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0C0C27;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s ease;
+        }
+
+        /* --- FIXED HEADER --- */
+        .app-header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 70px;
+            background: var(--bg); border-bottom: 1px solid #333;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 15px; z-index: 1000; box-sizing: border-box;
+        }
+        .header-title { display: flex; align-items: center; gap: 12px; font-weight: 900; font-size: 14px; letter-spacing: 1px; }
+        .back-icon { color: #ffffff; font-size: 1.4rem; cursor: pointer; text-decoration: none; display: flex; align-items: center; }
+        .header-title i.bi-trophy-fill { color: var(--accent); font-size: 1.4rem; filter: drop-shadow(0 0 5px var(--accent)); margin-left: 5px; }
+        .wallet-chip { background: #f94879; padding: 6px 12px; border-radius: 50px; display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 14px; color: white; text-decoration: none; }
+
+        /* --- DESIGNED LOGO SECTION --- */
+        .logo-stats-container {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 10px 0;
+        }
+        .bouncing-logo {
+            font-size: 50px;
+            color: var(--accent);
+            display: inline-block;
+            animation: bounce 2s infinite;
+            filter: drop-shadow(0 0 10px rgba(255, 204, 0, 0.5));
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+
+        .logo-text {
+            font-weight: 900;
+            font-size: 26px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-top: 8px;
+            display: block;
+            background: linear-gradient(180deg, #ffffff 0%, #ffcc00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 8px rgba(255, 204, 0, 0.3));
+            position: relative;
+        }
+        
+        .logo-text::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 2px;
+            background: var(--accent);
+            margin: 5px auto 0;
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background: var(--card);
+            border: 1px solid #333;
+            padding: 12px 5px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .stat-card span { display: block; }
+        .stat-val { font-size: 18px; font-weight: 900; color: var(--accent); }
+        .stat-label { font-size: 9px; color: #888; text-transform: uppercase; font-weight: bold; margin-top: 4px; }
+
+        /* --- TOURNAMENT CARDS --- */
+        #tournamentList { display: flex; flex-direction: column; gap: 20px; }
+        .t-card { background: var(--card); border-radius: 25px; border: 1px solid #333; padding: 20px; position: relative; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+        .special-match { border: 1.5px solid var(--special) !important; }
+        .local-match { border: 1.5px solid var(--local) !important; }
+
+        .tourney-id-tag { position: absolute; top: 0; left: 0; background: var(--accent); color: #000; padding: 5px 20px; font-weight: 900; font-size: 12px; border-bottom-right-radius: 20px; text-transform: uppercase; z-index: 5; }
+        .special-id-tag { background: var(--special) !important; color: #fff !important; }
+        .local-id-tag { background: var(--local) !important; color: #fff !important; }
+        
+        .t-tagline { 
+            font-size: 13px; color: #bbb; font-weight: 600; text-align: center; 
+            margin-bottom: 15px; display: block; line-height: 1.4; padding: 0 10px;
+        }
+
+        .t-title { color: #fff; font-size: 1.3rem; font-weight: 900; margin: 25px 0 5px 0; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .prize-label {
+            font-size: 10px; font-weight: 900; text-transform: uppercase;
+            color: var(--accent); text-align: center; margin-bottom: 8px;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .special-match .prize-label { color: var(--special); }
+        .local-match .prize-label { color: var(--local); }
+
+        .prize-container { display: flex; gap: 6px; margin-bottom: 12px; justify-content: center; flex-wrap: wrap; }
+        .prize-mini-box { background: #111; border: 1px solid #333; border-radius: 10px; padding: 6px 4px; text-align: center; flex: 1; min-width: 70px; }
+        .prize-mini-box i { font-size: 16px; display: block; margin-bottom: 2px; }
+        
+        .prize-mini-box span { font-size: 10px; font-weight: 900; color: #fff; display: block; }
+        .prize-mini-box .rank-tag { font-size: 7px; color: #888; text-transform: uppercase; font-weight: bold; }
+
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 10px; margin-bottom: 18px; }
+        .info-item { background: #222; padding: 10px 5px; border-radius: 12px; text-align: center; border: 1px solid #333; }
+        .info-label { font-size: 9px; color: #aaa; text-transform: uppercase; display: block; margin-bottom: 4px; font-weight: bold; }
+        .info-value { font-size: 11px; font-weight: 900; color: var(--accent); text-transform: uppercase; }
+
+        .slot-section { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
+        .slot-header { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 8px; font-weight: 900; text-transform: uppercase; }
+        .slot-bar-bg { background: #000; height: 8px; border-radius: 10px; width: 100%; overflow: hidden; }
+        .slot-bar-fill { height: 100%; width: 0%; transition: 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        .time-row { display: flex; align-items: center; justify-content: center; gap: 10px; color: #ccc; font-size: 12px; font-weight: 700; margin-bottom: 18px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 50px; }
+        
+        .btn-join { width: 100%; background: var(--accent); color: #000; border: none; padding: 16px; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 14px; transition: 0.3s; }
+        .btn-joined { background: var(--success) !important; color: white !important; }
+
+        .room-info-box { background: #0a0a0a; border: 1.5px dashed var(--accent); border-radius: 15px; padding: 18px; margin-top: 15px; display: none; }
+        .room-notice { color: #fff; font-size: 13px; font-weight: 800; text-align: center; margin-bottom: 10px; text-transform: uppercase; line-height: 1.4; }
+        .thanks-box { text-align: center; padding: 10px; color: #fff; font-size: 22px; font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .thanks-box i { color: #ff4d4d; font-size: 24px; animation: heartbeat 1.5s infinite; }
+        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
+        .room-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; border-bottom: 1px solid #222; }
+        .room-row span:last-child { color: var(--accent); font-weight: 900; }
+        .done-btn { width: 100%; margin-top: 15px; padding: 12px; border-radius: 12px; border: 1px solid #333; background: #222; color: #fff; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; }
+
+        .bottom-nav { position: fixed; bottom: 15px; left: 15px; right: 15px; background: #1a1a1a; display: flex; justify-content: space-around; align-items: center; padding: 10px 5px; border-radius: 40px; border: 1px solid #333; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none !important; color: #888; flex: 1; }
+        .nav-item i { font-size: 1.2rem; padding: 6px 18px; border-radius: 25px; transition: all 0.3s ease; margin-bottom: 4px; }
+        .nav-item span { font-size: 10px; font-weight: bold; }
+        .nav-item.active { color: var(--accent) !important; }
+        .nav-item.active i { background-color: var(--accent) !important; color: #000 !important; box-shadow: 0 0 15px var(--accent); }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card); padding: 30px; border-radius: 25px; width: 85%; max-width: 350px; border: 1px solid #444; text-align: center; }
+        .modal-input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid #333; background: #262626; color: #fff; outline: none; box-sizing: border-box; }
+
+        /* --- NO TOURNAMENTS EMPTY STYLE --- */
+        .no-tournaments-box {
+            background: var(--card);
+            border: 1.5px dashed #333;
+            border-radius: 25px;
+            padding: 50px 20px;
+            text-align: center;
+            margin-top: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+        .no-tournaments-box i {
+            font-size: 75px;
+            color: #444;
+            display: block;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.02));
+        }
+        .no-tournaments-box p {
+            font-size: 18px;
+            font-weight: 900;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="globalLoaderEl">
+        <iframe src="loading.html" style="width:100%; height:100%; border:none;"></iframe>
+    </div>
+
+    <header class="app-header">
+        <div class="header-title">
+            <a href="index.html" class="back-icon"><i class="fas fa-arrow-left"></i></a>
+            <i class="bi bi-trophy-fill"></i>
+            <span>AVAILABLE TOURNAMENTS</span>
+        </div>
+        <div class="wallet-chip" onclick="window.location.href='wallet.html'">
+            <i class="fas fa-wallet"></i>
+            <span id="walletBalance">0.00</span>
+        </div>
+    </header>
+
+    <div class="logo-stats-container">
+        <div class="bouncing-logo">
+            <i class="bi bi-controller"></i>
+        </div>
+        <span class="logo-text">FF TOURNAMENTS</span>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span id="totalMatches" class="stat-val">0</span>
+                <span class="stat-label">Total Matches</span>
+            </div>
+            <div class="stat-card">
+                <span id="joinedMatches" class="stat-val">0</span>
+                <span class="stat-label">Joined</span>
+            </div>
+            <div class="stat-card">
+                <span id="fullMatches" class="stat-val">0</span>
+                <span class="stat-label">Full</span>
+            </div>
+            <div class="stat-card" style="grid-column: span 3; margin-top: 6px;">
+                <span id="liveJoinedCount" class="stat-val">0</span>
+                <span class="stat-label">Live Joined</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="tournamentList">
+        <p style="text-align: center; color: var(--accent); font-size: 12px; margin-top: 20px;">Searching Live Matches...</p>
+    </div>
+
+    <div id="joinModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle" style="color:var(--accent); margin-top:0; font-weight:900;">REGISTER</h3>
+            <input type="text" id="playerName" class="modal-input" placeholder="In-Game Name">
+            <input type="number" id="playerUID" class="modal-input" placeholder="Game UID">
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button onclick="closeModal()" style="flex:1; padding:14px; background:#333; border:none; border-radius:12px; color:#fff; font-weight:bold;">CLOSE</button>
+                <button id="modalJoinBtn" onclick="submitJoin()" style="flex:1; padding:14px; background:var(--accent); border:none; border-radius:12px; font-weight:900; color:#000;">JOIN</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="javascript:void(0)" class="nav-item active"><i class="fas fa-gamepad"></i><span>Tournaments</span></a>
+        <a href="control.html" class="nav-item"><i class="fas fa-trophy"></i><span>Leaderboard</span></a>
+        <a href="profile.html" class="nav-item"><i class="fas fa-user-circle"></i><span>Profile</span></a>
+    </nav>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    
+    <script>
+        function hideLoader() {
+            const loader = document.getElementById('globalLoaderEl');
+            if (loader && loader.style.display !== 'none') {
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; }, 300);
+            }
+        }
+        const safetyTimeout = setTimeout(hideLoader, 3000);
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyANjbQLKEpV0Mj5e5PJzCPZvFo8a5vzy_k",
+            authDomain: "ff-tournamint-323ac.firebaseapp.com",
+            databaseURL: "https://ff-tournamint-323ac-default-rtdb.firebaseio.com",
+            projectId: "ff-tournamint-323ac",
+            storageBucket: "ff-tournamint-323ac.firebasestorage.app",
+            messagingSenderId: "157085748163",
+            appId: "1:157085748163:web:848536d10ae58d32398b76",
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let currentUserId = null;
+        let userWallet = 0;
+        let allRegistrations = [];
+
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                currentUserId = user.uid;
+                db.ref('users/' + user.uid + '/wallet').on('value', snap => {
+                    userWallet = snap.val() || 0;
+                    document.getElementById('walletBalance').innerText = parseFloat(userWallet).toFixed(2);
+                });
+                startListeners();
+                watchForRoomUpdates();
+            } else { window.location.href = "login-register.html"; }
+        }); 
+
+        function watchForRoomUpdates() {
+            if(!currentUserId) return;
+            db.ref('registrations').orderByChild('uid').equalTo(currentUserId).on('value', snap => {
+                snap.forEach(child => {
+                    const data = child.val();
+                    if(data.roomID && data.roomID !== "Waiting..." && data.roomID !== "") {
+                        const notifKey = 'notif_room_' + data.matchId;
+                        if(!localStorage.getItem(notifKey)) {
+                            db.ref('notifications/' + currentUserId).push({
+                                title: "Room Details Ready!",
+                                message: `Room ID and Password for Match ${data.tourneyNum} are now available.`,
+                                time: firebase.database.ServerValue.TIMESTAMP,
+                                read: false
+                            });
+                            localStorage.setItem(notifKey, 'true');
+                        }
+                    }
+                });
+            });
+        }
+
+        function startListeners() {
+            db.ref('registrations').on('value', snap => {
+                allRegistrations = [];
+                snap.forEach(c => { allRegistrations.push(c.val()); });
+                renderUI();
+            });
+            db.ref('tournaments').on('value', snap => {
+                window.tournamentsSnap = snap;
+                renderUI();
+                clearTimeout(safetyTimeout);
+                hideLoader();
+            });
+        }
+
+        function renderUI() {
+            const listDiv = document.getElementById('tournamentList');
+            if(!window.tournamentsSnap) return;
+            
+            listDiv.innerHTML = "";
+            let tTotal = 0;
+            let tJoined = 0;
+            let tFull = 0;
+            let liveJoinedActiveCount = 0;
+
+            if (!window.tournamentsSnap.exists() || window.tournamentsSnap.numChildren() === 0) {
+                document.getElementById('totalMatches').innerText = "0";
+                document.getElementById('joinedMatches').innerText = "0";
+                document.getElementById('fullMatches').innerText = "0";
+                document.getElementById('liveJoinedCount').innerText = "0";
+                
+                listDiv.innerHTML = `
+                    <div class="no-tournaments-box">
+                        <i class="bi bi-trophy"></i>
+                        <p>No Tournaments Available</p>
+                    </div>`;
+                return;
+            }
+
+            // Convert tournaments snapshot to an array for sorting
+            let tournamentsArray = [];
+            window.tournamentsSnap.forEach((child) => {
+                tournamentsArray.push({ key: child.key, val: child.val() });
+            });
+
+            // Calculate live joined count for currently existing tournaments that the user joined
+            if(currentUserId) {
+                liveJoinedActiveCount = allRegistrations.filter(r => {
+                    if (r.uid !== currentUserId) return false;
+                    return tournamentsArray.some(t => t.val.id === r.matchId);
+                }).length;
+            }
+            document.getElementById('liveJoinedCount').innerText = liveJoinedActiveCount;
+
+            // Sort tournaments: Joined ones come first
+            tournamentsArray.sort((a, b) => {
+                const regKeyA = currentUserId + '_' + a.val.id;
+                const regKeyB = currentUserId + '_' + b.val.id;
+                const isJoinedA = allRegistrations.some(r => r.matchId === a.val.id && r.uid === currentUserId);
+                const isJoinedB = allRegistrations.some(r => r.matchId === b.val.id && r.uid === currentUserId);
+                
+                if (isJoinedA && !isJoinedB) return -1;
+                if (!isJoinedA && isJoinedB) return 1;
+                return 0;
+            });
+
+            tournamentsArray.forEach((item) => {
+                const t = item.val;
+                tTotal++;
+
+                const regKey = currentUserId + '_' + t.id;
+                const isSpecial = (t.perKill && t.perKill !== "HIDE" && t.perKill !== "0");
+                const isLocal = (t.isLocal === true);
+
+                db.ref('registrations/' + regKey).on('value', rSnap => {
+                    const regData = rSnap.val();
+                    const isJoined = !!regData;
+                    const joinedCount = allRegistrations.filter(r => r.matchId === t.id).length;
+                    const totalSlots = parseInt(t.totalSlots) || 48;
+                    const percent = Math.min((joinedCount / totalSlots) * 100, 100);
+                    const isFull = joinedCount >= totalSlots;
+                    
+                    if(isFull) tFull++;
+
+                    document.getElementById('totalMatches').innerText = tTotal;
+                    document.getElementById('joinedMatches').innerText = allRegistrations.filter(r => r.uid === currentUserId).length;
+                    document.getElementById('fullMatches').innerText = tFull;
+
+                    let displayTime = t.mTime || 'TBA';
+                    if (t.mTime && t.mTime.includes(':')) {
+                        let parts = t.mTime.split(':');
+                        let hours = parseInt(parts[0]);
+                        let minutes = parts[1];
+                        
+                        if (!isNaN(hours)) {
+                            let ampm = hours >= 12 ? 'PM' : 'AM';
+                            hours = hours % 12;
+                            hours = hours ? hours : 12;
+                            
+                            let cleanMinutes = minutes.replace(/AM|PM|am|pm|\s/g, '');
+                            displayTime = hours + ':' + cleanMinutes + ' ' + ampm;
+                        }
+                    }
+
+                    let finalDateTime = (t.mDate && displayTime) ? `${t.mDate} | ${displayTime}` : (t.mDate || displayTime || "TBA");
+
+                    let prizeHtml = "";
+                    if(t.prizeDistribution) {
+                        const dist = t.prizeDistribution;
+                        const sectionLabel = `<div class="prize-label" style="${isFull ? 'color: var(--danger);' : ''}"><i class="bi bi-trophy"></i> PRIZE DISTRIBUTION</div>`;
+                        prizeHtml = sectionLabel + `<div class="prize-container">`;
+                        
+                        Object.keys(dist).forEach((key) => {
+                            const prizeObj = dist[key];
+                            const iconClass = prizeObj.icon || 'bi-trophy-fill';
+                            const customLabel = prizeObj.label || 'PRIZE';
+                            const customAmount = prizeObj.amount || '0';
+                            
+                            prizeHtml += `<div class="prize-mini-box"><i class="bi ${iconClass}" style="color: var(--accent);"></i><span class="rank-tag">${customLabel}</span><span>${customAmount}</span></div>`;
+                        });
+                        prizeHtml += `</div>`;
+                    }
+
+                    const isConfirmed = regData?.isDone === true;
+
+                    let cardBorderStyle = "";
+                    let tagBackgroundStyle = "";
+                    
+                    if(isFull) {
+                        cardBorderStyle = "border: 1.5px solid rgba(255, 77, 77, 0.4) !important;";
+                        tagBackgroundStyle = "background: var(--danger) !important; color: #fff !important;";
+                    } else if(isSpecial) {
+                        cardBorderStyle = "border: 1.5px solid var(--special) !important;";
+                        tagBackgroundStyle = "background: var(--special) !important; color: #fff !important;";
+                    } else if(isLocal) {
+                        cardBorderStyle = "border: 1.5px solid var(--local) !important;";
+                        tagBackgroundStyle = "background: var(--local) !important; color: #fff !important;";
+                    }
+
+                    const cardHtml = `
+                        <div class="t-card" style="${cardBorderStyle}">
+                            <div class="tourney-id-tag" style="${tagBackgroundStyle}">ID: ${t.tourneyNum || '00'} ${isFull ? '(FULL)' : ''}</div>
+                            <div class="t-title">${t.title}</div>
+                            <div class="t-tagline">${t.tagLine || ''}</div>
+                            <div class="info-grid">
+                                <div class="info-item"><span class="info-label">Entry</span><span class="info-value" style="${isFull ? 'color: var(--danger);' : ''}">Rs.${t.entryFee}</span></div>
+                                <div class="info-item"><span class="info-label">Prize</span><span class="info-value" style="${isFull ? 'color: var(--danger);' : ''}">Rs.${t.totalPrize}</span></div>
+                                <div class="info-item"><span class="info-label">Map</span><span class="info-value">${t.version || 'Classic'}</span></div>
+                                <div class="info-item"><span class="info-label">Mode</span><span class="info-value">${t.type || 'N/A'}</span></div>
+                                ${t.perKill && t.perKill !== "HIDE" && t.perKill !== "0" ? `<div class="info-item"><span class="info-label">Per Kill</span><span class="info-value" style="${isFull ? 'color: var(--danger);' : ''}">Rs.${t.perKill}</span></div>` : ''}
+                            </div>
+                            ${prizeHtml}
+                            <div class="slot-section">
+                                <div class="slot-header"><span>Live Slots</span><span>${joinedCount}/${totalSlots}</span></div>
+                                <div class="slot-bar-bg"><div class="slot-bar-fill" style="width: ${percent}%; background: ${isFull ? 'var(--danger)' : (isLocal ? 'var(--local)' : 'var(--accent)')};"></div></div>
+                            </div>
+                            <div class="time-row"><i class="bi bi-calendar3"></i> ${finalDateTime}</div>
+                            ${isJoined ? 
+                                `<button class="btn-join btn-joined" onclick="toggleRoom('${t.id}')"><i class="bi bi-key-fill"></i> VIEW ROOM DETAILS</button>` : 
+                                (isFull ? `<button class="btn-join" style="background: rgba(255, 77, 77, 0.2); color: var(--danger); border: 1px solid var(--danger);" disabled>MATCH FULL</button>` : `<button class="btn-join" onclick="openJoinModal('${t.id}', '${t.title}', ${t.entryFee}, '${t.tourneyNum}', ${isSpecial})">JOIN TOURNAMENT</button>`)
+                            }
+                            <div id="roomBox_${t.id}" class="room-info-box" style="display:none">
+                                ${isConfirmed ? 
+                                    `<div class="room-row"><span>ROOM ID</span><span>${regData?.roomID || 'Waiting...'}</span></div>
+                                     <div class="room-row"><span>PASSWORD</span><span>${regData?.roomPass || 'Waiting...'}</span></div>
+                                     <div class="thanks-box" style="margin-top:15px;">THANKS <i class="fas fa-heart"></i></div>` : 
+                                    `<div class="room-notice">ROOM ID & PASS MILNA KA BAD MARK AS DONE CLICK KAREN</div>
+                                     <div class="room-row"><span>ROOM ID</span><span id="roomID_${t.id}">${regData?.roomID || 'Waiting...'}</span></div>
+                                     <div class="room-row"><span>PASSWORD</span><span id="roomPass_${t.id}">${regData?.roomPass || 'Waiting...'}</span></div>
+                                     <button class="done-btn" onclick="markAsDone('${t.id}')"><i class="bi bi-check-circle"></i> <span>MARK AS DONE</span></button>`
+                                }
+                            </div>
+                        </div>`;
+
+                    let container = document.getElementById('container_' + t.id);
+                    if(!container) {
+                        container = document.createElement('div');
+                        container.id = 'container_' + t.id;
+                        listDiv.appendChild(container);
+                    }
+                    container.innerHTML = cardHtml;
+                });
+            });
+        }
+
+        function toggleRoom(id) {
+            const box = document.getElementById('roomBox_' + id);
+            box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function markAsDone(id) {
+            const roomID = document.getElementById('roomID_' + id).innerText;
+            if (roomID === "Waiting..." || !roomID) return alert("Room Details not ready!");
+            db.ref('registrations/' + currentUserId + '_' + id).update({ isDone: true });
+        }
+
+        let selectedData = {};
+        function openJoinModal(id, title, fee, tNum, isSpecial) {
+            selectedData = { id, title, fee, tNum };
+            document.getElementById('joinModal').style.display = 'flex';
+        }
+        function closeModal() { document.getElementById('joinModal').style.display = 'none'; }
+
+        function submitJoin() {
+            const name = document.getElementById('playerName').value;
+            const uid = document.getElementById('playerUID').value;
+            if(!name || !uid) return alert("Enter Name & UID!");
+            if (userWallet < selectedData.fee) return alert("Low Balance!");
+            const regKey = currentUserId + '_' + selectedData.id;
+            const updates = {};
+            updates['/registrations/' + regKey] = {
+                regId: regKey, uid: currentUserId, matchId: selectedData.id,
+                matchTitle: selectedData.title, playerName: name, playerUID: uid,
+                tourneyNum: selectedData.tNum, roomID: "", roomPass: "", isDone: false,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+            updates['/users/' + currentUserId + '/wallet'] = userWallet - selectedData.fee;
+            db.ref().update(updates).then(() => {
+                alert("Joined Successfully! ✅");
+                closeModal();
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>FF GameZone PK - Leaderboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root { 
+            --accent: #ffcc00; 
+            --bg: #0F0C29; 
+            --card: #1a1a3c; 
+        }
+
+        /* --- TAP EFFECT REMOVAL --- */
+        * { -webkit-tap-highlight-color: transparent; outline: none !important; }
+
+        body { 
+            background-color: var(--bg); 
+            color: white; 
+            font-family: 'Segoe UI', sans-serif; 
+            text-align: center; 
+            margin: 0; 
+            padding: 80px 0 120px 0; 
+            overflow-x: hidden; 
+        }
+
+        /* --- LOADER STYLE --- */
+        #globalLoaderEl {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0C0C27; z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.3s ease;
+        }
+
+        /* --- FIXED HEADER --- */
+        .app-header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 70px;
+            background: var(--bg); border-bottom: 1px solid #333;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 15px; z-index: 1000; box-sizing: border-box;
+        }
+        
+        .header-title { display: flex; align-items: center; gap: 8px; font-weight: 900; font-size: 16px; letter-spacing: 1px; }
+        .header-title i { color: var(--accent); font-size: 1.2rem; filter: drop-shadow(0 0 5px var(--accent)); }
+        .back-icon { color: #ffffff; font-size: 1.4rem; cursor: pointer; text-decoration: none; display: flex; align-items: center; }
+        
+        .wallet-chip {
+            background: #f94879; padding: 6px 12px; border-radius: 50px;
+            display: flex; align-items: center; gap: 8px; font-weight: bold;
+            font-size: 14px; color: white;
+        }
+
+        /* --- HERO SECTION --- */
+        .top-hero-section {
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .big-trophy {
+            font-size: 60px; 
+            color: var(--accent);
+            filter: drop-shadow(0 0 15px rgba(255, 204, 0, 0.5));
+            margin-bottom: 10px;
+            animation: cupBounce 2s infinite ease-in-out;
+        }
+        
+        @keyframes cupBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .top-player-text {
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #4facfe;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(79, 172, 254, 0.4);
+        }
+
+        /* --- PODIUM DESIGN --- */
+        .podium-container {
+            display: flex; justify-content: center; align-items: flex-end;
+            margin: 30px 10px 30px 10px; height: 260px;
+        }
+        .podium-item { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; }
+        .rank-1 { order: 2; transform: scale(1.15); z-index: 3; margin-bottom: 25px; }
+        .rank-2 { order: 1; z-index: 2; margin-right: -10px; }
+        .rank-3 { order: 3; z-index: 1; margin-left: -10px; }
+
+        .crown { 
+            position: absolute; top: -35px; 
+            filter: drop-shadow(0 0 10px rgba(255,215,0,0.8)); 
+            animation: crownFloat 2s infinite ease-in-out;
+        }
+        .rank-1 .crown { font-size: 45px; top: -50px; } 
+        .rank-2 .crown { font-size: 30px; opacity: 0.8; } 
+        .rank-3 .crown { font-size: 25px; opacity: 0.6; } 
+
+        @keyframes crownFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .podium-img { width: 75px; height: 75px; border-radius: 50%; object-fit: cover; background: #1A1A3C; }
+        .rank-1 .podium-img { border: 4px solid #FFD700; box-shadow: 0 0 20px #FFD700; }
+        .rank-2 .podium-img { width: 65px; height: 65px; border: 3px solid #C0C0C0; box-shadow: 0 0 12px #C0C0C0; }
+        .rank-3 .podium-img { width: 60px; height: 60px; border: 3px solid #CD7F32; box-shadow: 0 0 10px #CD7F32; }
+
+        .podium-name { font-weight: bold; font-size: 13px; margin-top: 10px; text-shadow: 0 0 5px black; width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .podium-stats { font-size: 9px; display: flex; flex-direction: column; gap: 2px; margin-top: 4px; font-weight: bold; }
+        .podium-stats .pod-stat { display: flex; align-items: center; justify-content: center; gap: 3px; }
+        .podium-stats .pod-stat.kills { color: #4facfe; }
+        .podium-stats .pod-stat.points { color: var(--accent); }
+        .rank-tag { font-size: 9px; font-weight: bold; padding: 2px 10px; border-radius: 20px; margin-top: 5px; color: black; }
+
+        /* --- LIST ITEMS --- */
+        .leader-item { 
+            display: flex; align-items: center;
+            background: rgba(26, 26, 60, 0.9); margin: 10px 20px; padding: 12px; 
+            border-radius: 15px; border: 1px solid #333;
+        }
+        .p-img-small { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 1px solid #4facfe; }
+        .p-info { flex-grow: 1; text-align: left; margin-left: 15px; }
+        .rank-number { font-weight: bold; width: 35px; color: #4facfe; font-size: 18px; }
+        .p-stats { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-top: 2px; }
+        .p-stat-box { display: flex; align-items: center; gap: 3px; color: #aaa; }
+        .p-stat-box i { font-size: 10px; color: var(--accent); }
+
+        /* --- BOTTOM NAV --- */
+        .bottom-nav {
+            position: fixed; bottom: 15px; left: 15px; right: 15px;
+            background: #1a1a1a; display: flex; justify-content: space-around;
+            align-items: center; padding: 10px 5px; border-radius: 40px; 
+            border: 1px solid #333; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none !important; color: #888; flex: 1; }
+        .nav-item i { font-size: 1.2rem; padding: 6px 18px; border-radius: 25px; margin-bottom: 4px; }
+        .nav-item span { font-size: 10px; font-weight: bold; text-transform: capitalize; }
+        .nav-item.active { color: var(--accent) !important; }
+        .nav-item.active i { background-color: var(--accent) !important; color: #000 !important; box-shadow: 0 0 15px var(--accent); }
+
+        /* --- NO LEADERBOARD EMPTY STYLE --- */
+        .no-leaderboard-box {
+            background: rgba(26, 26, 60, 0.9);
+            border: 1.5px dashed #333;
+            border-radius: 25px;
+            padding: 50px 20px;
+            text-align: center;
+            margin: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+        .no-leaderboard-box i {
+            font-size: 75px;
+            color: #444;
+            display: block;
+            margin-bottom: 20px;
+        }
+        .no-leaderboard-box p {
+            font-size: 18px;
+            font-weight: 900;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="globalLoaderEl">
+        <iframe src="loading.html" style="width:100%; height:100%; border:none;"></iframe>
+    </div>
+
+    <header class="app-header">
+        <div class="header-title">
+            <a href="index.html" class="back-icon"><i class="fas fa-arrow-left"></i></a>
+            <i class="bi bi-trophy-fill"></i>
+            <span>LEADERBOARD</span>
+        </div>
+        <div class="wallet-chip">
+            <i class="fas fa-wallet"></i>
+            <span id="walletBalance">0.00</span>
+        </div>
+    </header>
+
+    <div class="top-hero-section">
+        <i class="bi bi-trophy-fill big-trophy"></i>
+        <div class="top-player-text">TOP PLAYER</div>
+    </div>
+
+    <div class="podium-container" id="podium"></div>
+    <div id="leader-list"></div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="stile.html" class="nav-item">
+            <i class="fas fa-gamepad"></i>
+            <span>Tournaments</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item active">
+            <i class="fas fa-trophy"></i>
+            <span>Leaderboard</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user-circle"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <script>
+        function hideLoader() {
+            const loader = document.getElementById('globalLoaderEl');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; }, 300);
+            }
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyANjbQLKEpV0Mj5e5PJzCPZvFo8a5vzy_k",
+            authDomain: "ff-tournamint-323ac.firebaseapp.com",
+            databaseURL: "https://ff-tournamint-323ac-default-rtdb.firebaseio.com",
+            projectId: "ff-tournamint-323ac",
+            storageBucket: "ff-tournamint-323ac.firebasestorage.app",
+            appId: "1:157085748163:web:848536d10ae58d32398b76"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                database.ref('users/' + user.uid + '/wallet').on('value', snap => {
+                    document.getElementById('walletBalance').innerText = parseFloat(snap.val() || 0).toFixed(2);
+                });
+            }
+        });
+
+        database.ref('Leaderboard').on('value', (snapshot) => {
+            const podiumDiv = document.getElementById('podium');
+            const listDiv = document.getElementById('leader-list');
+            podiumDiv.innerHTML = "";
+            listDiv.innerHTML = "";
+
+            // Check if Leaderboard node is empty or doesn't exist
+            if (!snapshot.exists() || snapshot.numChildren() === 0) {
+                podiumDiv.style.display = "none"; // Podium hide karein jab data na ho
+                listDiv.innerHTML = `
+                    <div class="no-leaderboard-box">
+                        <i class="bi bi-trophy"></i>
+                        <p>No Leaderboard Available</p>
+                    </div>`;
+                hideLoader();
+                return;
+            }
+
+            // Agar data ho toh podium ko wapas flex show karein
+            podiumDiv.style.display = "flex";
+
+            let players = [];
+            snapshot.forEach((child) => { players.push(child.val()); });
+
+            players.sort((a, b) => parseInt(a.rank) - parseInt(b.rank));
+
+            players.forEach((val) => {
+                const rank = parseInt(val.rank);
+                const photo = val.photo || 'https://via.placeholder.com/100';
+                const kills = val.kills || 0;
+                const points = val.points || 0;
+
+                if (rank <= 3) {
+                    podiumDiv.innerHTML += `
+                        <div class="podium-item rank-${rank}">
+                            <div class="crown">👑</div>
+                            <img class="podium-img" src="${photo}">
+                            <div class="podium-name">${val.name}</div>
+                            <div class="podium-stats">
+                                <div class="pod-stat kills"><i class="fas fa-crosshairs"></i> ${kills}</div>
+                                <div class="pod-stat points"><i class="fas fa-star"></i> ${points}</div>
+                            </div>
+                            <div class="rank-tag" style="background:${rank==1?'#FFD700':(rank==2?'#C0C0C0':'#CD7F32')}">#${rank}</div>
+                        </div>
+                    `;
+                } else {
+                    listDiv.innerHTML += `
+                        <div class="leader-item">
+                            <div class="rank-number">${rank}</div>
+                            <img class="p-img-small" src="${photo}">
+                            <div class="p-info">
+                                <div style="font-weight:bold;">${val.name}</div>
+                                <div class="p-stats">
+                                    <div class="p-stat-box"><i class="fas fa-crosshairs"></i> Kills: ${kills}</div>
+                                    <div class="p-stat-box"><i class="fas fa-star"></i> Points: ${points}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            hideLoader();
+        });
+    </script>
+</body>
+</html>

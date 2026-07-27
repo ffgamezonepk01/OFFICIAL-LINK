@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Notifications - FF GameZone PK</title>
+<link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0C0C27;
+            --bg-secondary: #1C1C3A;
+            --accent-yellow: #FACC15;
+            --accent-red: #F94879;
+            --accent-blue: #3b82f6; 
+            --accent-green: #2ecc71; 
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0B8;
+            --border-color: #2a2a4a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--bg-primary); color: var(--text-primary); }
+
+        /* Header */
+        .header {
+            display: flex; align-items: center; padding: 15px;
+            background: var(--bg-secondary); border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .back-btn { background: none; border: none; color: white; font-size: 1.2rem; margin-right: 15px; cursor: pointer; }
+
+        /* Notification List */
+        .notif-container { padding: 15px; }
+        
+        .notif-card {
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            gap: 15px;
+            transition: 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .notif-card::before {
+            content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px;
+            background: var(--accent-yellow);
+        }
+
+        .notif-card.withdraw::before { background: var(--accent-red); }
+        .notif-card.support::before { background: var(--accent-blue); }
+        .notif-card.room::before { background: var(--accent-green); }
+        .notif-card.wallet::before { background: var(--accent-yellow); } /* Wallet bar color */
+
+        .notif-icon {
+            width: 45px; height: 45px; border-radius: 50%;
+            background: rgba(250, 204, 21, 0.1);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--accent-yellow); font-size: 1.3rem; flex-shrink: 0;
+        }
+
+        .withdraw .notif-icon {
+            background: rgba(249, 72, 121, 0.1);
+            color: var(--accent-red);
+        }
+
+        .support .notif-icon {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-blue);
+        }
+
+        .room .notif-icon {
+            background: rgba(46, 204, 113, 0.1);
+            color: var(--accent-green);
+        }
+
+        .wallet .notif-icon {
+            background: rgba(250, 204, 21, 0.1);
+            color: var(--accent-yellow);
+        }
+
+        .notif-content { flex-grow: 1; }
+        .notif-content h3 { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: #fff; }
+        .notif-content p { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+        .notif-time { font-size: 10px; color: #555; margin-top: 8px; display: block; font-weight: 600; }
+
+        /* Empty State */
+        .empty-state { text-align: center; margin-top: 100px; padding: 20px; }
+        .empty-state i { font-size: 5rem; color: var(--bg-secondary); margin-bottom: 15px; }
+        .empty-state p { color: var(--text-secondary); font-size: 14px; }
+
+        #loader {
+            display: flex; justify-content: center; padding: 50px;
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid var(--accent-yellow); border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <button class="back-btn" onclick="window.history.back()"><i class="fas fa-arrow-left"></i></button>
+        <h2 style="font-size: 18px; font-weight: 700;">Announcements</h2>
+    </div>
+
+    <div id="loader"><div class="spinner"></div></div>
+
+    <div id="notifList" class="notif-container" style="display: none;"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyANjbQLKEpV0Mj5e5PJzCPZvFo8a5vzy_k",
+            authDomain: "ff-tournamint-323ac.firebaseapp.com",
+            databaseURL: "https://ff-tournamint-323ac-default-rtdb.firebaseio.com",
+            projectId: "ff-tournamint-323ac",
+            storageBucket: "ff-tournamint-323ac.firebasestorage.app",
+            appId: "1:157085748163:web:848536d10ae58d32398b76"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loadUserNotifications(user.uid);
+            } else {
+                window.location.href = "login-register.html";
+            }
+        });
+
+        function loadUserNotifications(uid) {
+            const notifRef = ref(db, 'notifications/' + uid);
+            
+            onValue(notifRef, (snapshot) => {
+                document.getElementById('loader').style.display = 'none';
+                const list = document.getElementById('notifList');
+                list.style.display = 'block';
+                list.innerHTML = "";
+
+                if (!snapshot.exists()) {
+                    list.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-bell-slash"></i>
+                            <p>Abhi tak koi notification nahi hai.</p>
+                        </div>`;
+                    return;
+                }
+
+                const data = snapshot.val();
+                const sortedNotifs = Object.entries(data).reverse();
+
+                sortedNotifs.forEach(([key, val]) => {
+                    const card = document.createElement('div');
+                    
+                    // Logic to detect notification type
+                    const isWalletUpdate = val.title.toLowerCase().includes('wallet');
+                    const isRoomNotif = val.title.toLowerCase().includes('room');
+                    const isSupport = val.title.toLowerCase().includes('support') || (val.link && val.link.includes('support'));
+                    const isWithdraw = val.type === 'withdraw' || val.title.toLowerCase().includes('withdraw');
+
+                    // Set class for styling
+                    if(isWalletUpdate) card.className = 'notif-card wallet';
+                    else if(isRoomNotif) card.className = 'notif-card room';
+                    else if(isSupport) card.className = 'notif-card support';
+                    else if(isWithdraw) card.className = 'notif-card withdraw';
+                    else card.className = 'notif-card';
+                    
+                    // Click logic
+                    card.onclick = () => {
+                        if (isRoomNotif) {
+                            window.location.href = "stile.html";
+                        } else if (isSupport || val.link === "support.html") {
+                            window.location.href = "support.html";
+                        } else {
+                            window.location.href = "wallet.html";
+                        }
+                    };
+
+                    // Icon Selection
+                    let iconClass = 'fa-bell'; 
+                    if (isWalletUpdate) iconClass = 'fa-wallet'; // Wallet icon
+                    else if (isRoomNotif) iconClass = 'fa-gamepad';
+                    else if (isSupport) iconClass = 'fa-headset';
+                    else if (isWithdraw) iconClass = 'fa-hand-holding-dollar';
+                    
+                    const timeStr = val.time ? new Date(val.time).toLocaleString() : new Date().toLocaleString();
+
+                    card.innerHTML = `
+                        <div class="notif-icon"><i class="fas ${iconClass}"></i></div>
+                        <div class="notif-content">
+                            <h3>${val.title}</h3>
+                            <p>${val.message}</p>
+                            <span class="notif-time">${timeStr}</span>
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

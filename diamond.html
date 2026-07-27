@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diamond Store</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #000;
+    margin: 0;
+    color: #fff;
+    padding-bottom: 80px;
+}
+
+/* 🔙 TOP NAVIGATION BAR */
+.top-nav {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: #0F0C29;
+    gap: 15px;
+    border-bottom: 1px solid #333;
+}
+.back-btn {
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.back-btn img { width: 100%; filter: invert(1); }
+.nav-title {
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+}
+.diamond-logo { width: 22px; height: 22px; }
+
+/* TOP BANNER */
+.banner img { width: 100%; display: block; }
+.sub-banner img { width: 100%; display: block; margin-top: 5px; border-radius: 10px; }
+
+/* 📜 HISTORY SECTION */
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: #111;
+    margin: 10px 15px;
+    border-radius: 10px;
+    border: 1px dashed #4ed1ff;
+    cursor: pointer;
+}
+.history-header img { width: 25px; height: 25px; }
+#historyContent {
+    display: none;
+    margin: 0 15px 15px;
+    background: #111;
+    padding: 10px;
+    border-radius: 10px;
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #333;
+}
+.history-item {
+    background: #1a1a1a;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border-left: 4px solid #f1c40f;
+    font-size: 13px;
+}
+.history-item.rejected-history {
+    border-left-color: #e74c3c !important;
+}
+.status-pending { color: #f1c40f; font-weight: bold; }
+.status-success { color: #2ecc71; font-weight: bold; }
+.status-rejected { color: #e74c3c; font-weight: bold; }
+
+/* 🔐 LOGIN / ACCOUNT */
+.login-box {
+    background: #111;
+    margin: 15px;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #333;
+}
+.login-header { display: flex; align-items: center; gap: 10px; }
+.step { background: red; padding: 6px 12px; border-radius: 8px; font-weight: bold; }
+.action { margin-left: auto; color: red; cursor: pointer; }
+.form-box { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.form-box input { padding: 12px; border-radius: 10px; border: none; background: #222; color: #fff; }
+.form-box button { background: red; color: #fff; border: none; padding: 12px; border-radius: 10px; cursor: pointer; }
+.account-info { margin-top: 10px; }
+
+/* CONTAINER & GRID */
+.container { padding: 15px; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.box { background: #111; border-radius: 12px; padding: 15px; text-align: center; border: 1px solid #333; cursor: pointer; }
+.box.selected { border: 2px solid red !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); }
+.price { color: #00ff99; font-weight: bold; }
+.title { margin: 20px 0 10px; font-size: 20px; font-weight: bold; }
+.deals { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.card { background: #111; border-radius: 12px; padding: 8px; border: 1px solid #333; cursor: pointer; }
+.card.selected { border: 2px solid red !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); }
+.card img { width: 100%; border-radius: 10px; }
+.card p { margin: 8px 0 4px; text-align: center; }
+
+/* ⚠️ TOPUP BAR */
+#topupBar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: yellow;
+    color: #000;
+    text-align: center;
+    padding: 15px;
+    font-weight: bold;
+    font-size: 18px;
+    cursor: pointer;
+    display: none;
+    z-index: 1000;
+}
+</style>
+</head>
+
+<body>
+
+<div class="top-nav">
+    <div class="back-btn" onclick="window.location.href='index.html'">
+        <img src="https://cdn-icons-png.flaticon.com/512/271/271220.png" alt="back">
+    </div>
+    <div class="nav-title">
+        FREEFIRE TOPUP 
+        <img src="https://cdn-icons-png.flaticon.com/512/9183/9183492.png" class="diamond-logo" alt="diamond">
+    </div>
+</div>
+
+<div class="banner">
+    <img src="https://i.ibb.co/KzLK3fDT/Screenshot-20260430-170514.png">
+</div>
+
+<div class="history-header" onclick="toggleHistory()">
+    <div style="display:flex; align-items:center; gap:10px;">
+        <img src="https://cdn-icons-png.flaticon.com/512/2972/2972531.png">
+        <span>TOPUP HISTORY</span>
+    </div>
+    <span id="historyArrow">▼</span>
+</div>
+<div id="historyContent">Loading History...</div>
+
+<div class="sub-banner">
+    <img src="https://i.ibb.co/60yGqjnq/Screenshot-20260430-175337.png">
+</div>
+
+<div class="login-box">
+    <div class="login-header">
+        <span class="step">1</span>
+        <h3 id="titleText">Login</h3>
+        <span class="action" id="newBtn" style="display:none;">Edit Profile</span>
+    </div>
+    <div class="form-box" id="formBox">
+        <input type="text" id="name" placeholder="Enter Name">
+        <input type="text" id="playerId" placeholder="Enter Player UID">
+        <button id="saveBtn">Save</button>
+    </div>
+    <div class="account-info" id="accountBox" style="display:none;">
+        <p><b>Username:</b> <span id="showName"></span></p>
+        <p>Player UID: <span id="showId"></span></p>
+        <p><b>Wallet:</b> <span id="showWallet">0</span> PKR</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="grid">
+        <div class="box" onclick="selectItem(this, 400, '💎 280')">💎 280<div class="price">400 PKR</div></div>
+        <div class="box" onclick="selectItem(this, 500, '💎 355')">💎 355<div class="price">500 PKR</div></div>
+        <div class="box" onclick="selectItem(this, 600, '💎 425')">💎 425<div class="price">600 PKR</div></div>
+        <div class="box" onclick="selectItem(this, 700, '💎 495')">💎 495<div class="price">700 PKR</div></div>
+        <div class="box" onclick="selectItem(this, 800, '💎 565')">💎 565<div class="price">800 PKR</div></div>
+        <div class="box" onclick="selectItem(this, 900, '💎 635')">💎 635<div class="price">900 PKR</div></div>
+        <div class="box" onclick="selectItem(this, 1000, '💎 713')">💎 713<div class="price">1000 PKR</div></div>
+        <div class="box" onclick="selectItem(this, 2000, '💎 1426')">💎 1426<div class="price">2000 PKR</div></div>
+    </div>
+
+    <div class="title">Special Deals</div>
+    <div class="deals">
+        <div class="card" onclick="selectItem(this, 200, 'Weekly Lite')"><img src="https://i.ibb.co/8DqT39bB/Screenshot-20260430-173638.png"><p>Weekly Lite</p><div class="price">200 PKR</div></div>
+        <div class="card" onclick="selectItem(this, 340, 'Weekly Membership')"><img src="https://i.ibb.co/jvQcvtZ3/Screenshot-20260430-173604.png"><p>Weekly Membership</p><div class="price">340 PKR</div></div>
+        <div class="card" onclick="selectItem(this, 1380, 'Monthly Membership')"><img src="https://i.ibb.co/5g7qQ7Lf/Screenshot-20260430-173626.png"><p>Monthly Membership</p><div class="price">1380 PKR</div></div>
+        <div class="card" onclick="selectItem(this, 200, 'Evo Access 3D')"><img src="https://i.ibb.co/bMTG9vf4/Screenshot-20260430-173659.png"><p>Evo Access 3D</p><div class="price">200 PKR</div></div>
+        <div class="card" onclick="selectItem(this, 300, 'Evo Access 7D')"><img src="https://i.ibb.co/0ypYGyHv/Screenshot-20260430-173716.png"><p>Evo Access 7D</p><div class="price">300 PKR</div></div>
+        <div class="card" onclick="selectItem(this, 900, 'Evo Access 30D')"><img src="https://i.ibb.co/nNbK3T6N/Screenshot-20260430-173735.png"><p>Evo Access 30D</p><div class="price">900 PKR</div></div>
+    </div>
+</div>
+
+<div id="topupBar" onclick="handleTopup()">TOPUP NOW</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getDatabase, ref, get, set, push, update, onValue, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyANjbQLKEpV0Mj5e5PJzCPZvFo8a5vzy_k",
+        authDomain: "ff-tournamint-323ac.firebaseapp.com",
+        databaseURL: "https://ff-tournamint-323ac-default-rtdb.firebaseio.com",
+        projectId: "ff-tournamint-323ac",
+        storageBucket: "ff-tournamint-323ac.firebasestorage.app",
+        messagingSenderId: "157085748163",
+        appId: "1:157085748163:web:848536d10ae58d32398b76"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    let currentUser = null;
+    let isProfileSaved = false;
+    let currentWallet = 0;
+    let selectedPrice = 0;
+    let selectedItemName = "";
+    let savedPlayerName = "";
+    let savedPlayerId = "";
+
+    window.toggleHistory = function() {
+        const content = document.getElementById("historyContent");
+        const arrow = document.getElementById("historyArrow");
+        if (content.style.display === "block") {
+            content.style.display = "none";
+            arrow.innerText = "▼";
+        } else {
+            content.style.display = "block";
+            arrow.innerText = "▲";
+            loadHistory();
+        }
+    }
+
+    function loadHistory() {
+        if (!currentUser) return;
+        const topupRef = query(ref(db, 'Requests/Topups'), orderByChild('userId'), equalTo(currentUser.uid));
+        onValue(topupRef, (snapshot) => {
+            const container = document.getElementById("historyContent");
+            container.innerHTML = "";
+            if (!snapshot.exists()) {
+                container.innerHTML = "<p style='text-align:center;font-size:12px;'>No history found.</p>";
+                return;
+            }
+            snapshot.forEach((child) => {
+                const data = child.val();
+                const isRejected = data.status === "Rejected";
+                let historyClass = "history-item";
+                if (isRejected) historyClass += " rejected-history";
+
+                let statusClass = "status-pending";
+                if (data.status === "Successful" || data.status === "Success") {
+                    statusClass = "status-success";
+                } else if (isRejected) {
+                    statusClass = "status-rejected";
+                }
+
+                let reasonHtml = (isRejected && data.reason) ? `<br><span style="color:#ff6b6b; font-size:12px;">Reason: <b>${data.reason}</b></span>` : '';
+                let pName = data.playerName || savedPlayerName || 'N/A';
+                let pId = data.playerId || savedPlayerId || 'N/A';
+                let timeStr = data.timestamp ? new Date(data.timestamp).toLocaleString() : "Wait...";
+
+                container.innerHTML += `
+                    <div class="${historyClass}">
+                        <b>${data.itemName}</b> (RS. ${data.amount})<br>
+                        Name: <b>${pName}</b> | UID: <b style="color:#4ed1ff">${pId}</b><br>
+                        Status: <span class="${statusClass}">${data.status}</span>
+                        ${reasonHtml}
+                        <br><small style="color:#aaa;">${timeStr}</small>
+                    </div>
+                `;
+            });
+        });
+    }
+
+    window.selectItem = function(element, price, itemName) {
+        if (!isProfileSaved) { alert("Pehlay apna account save karein!"); return; }
+        selectedPrice = price;
+        selectedItemName = itemName;
+        document.querySelectorAll('.box, .card').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+        document.getElementById("topupBar").style.display = "block";
+    };
+
+    window.handleTopup = async function() {
+        if (currentWallet < selectedPrice) { alert("Insufficient Balance!"); return; }
+        if (confirm(`Order ${selectedItemName} for ${selectedPrice} PKR?`)) {
+            const newBalance = currentWallet - selectedPrice;
+            try {
+                await update(ref(db, 'users/' + currentUser.uid), { wallet: newBalance });
+                const newTopupReq = push(ref(db, 'Requests/Topups'));
+                await set(newTopupReq, {
+                    userId: currentUser.uid,
+                    email: currentUser.email || "N/A",
+                    playerName: savedPlayerName,
+                    playerId: savedPlayerId,
+                    itemName: selectedItemName,
+                    amount: selectedPrice,
+                    status: "Pending",
+                    timestamp: Date.now()
+                });
+                alert("Order Placed Successfully!");
+                document.getElementById("topupBar").style.display = "none";
+                document.querySelectorAll('.box, .card').forEach(el => el.classList.remove('selected'));
+            } catch (e) { alert("Error: " + e.message); }
+        }
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) { currentUser = user; loadGameProfile(user.uid); }
+        else { window.location.href = "login-register.html"; }
+    });
+
+    document.getElementById("saveBtn").onclick = async () => {
+        let name = document.getElementById("name").value;
+        let id = document.getElementById("playerId").value;
+        if(name === "" || id === "") return alert("Fill all fields");
+        await update(ref(db, 'users/' + currentUser.uid + '/gameProfile'), { name: name, playerId: id });
+        alert("Saved!");
+    };
+
+    function loadGameProfile(uid) {
+        onValue(ref(db, 'users/' + uid), (snapshot) => {
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                currentWallet = userData.wallet || 0;
+                document.getElementById("showWallet").innerText = currentWallet;
+                if(userData.gameProfile) {
+                    isProfileSaved = true;
+                    savedPlayerName = userData.gameProfile.name;
+                    savedPlayerId = userData.gameProfile.playerId;
+                    document.getElementById("formBox").style.display = "none";
+                    document.getElementById("accountBox").style.display = "block";
+                    document.getElementById("newBtn").style.display = "block";
+                    document.getElementById("showName").innerText = savedPlayerName;
+                    document.getElementById("showId").innerText = savedPlayerId;
+                }
+            }
+        });
+    }
+
+    document.getElementById("newBtn").onclick = () => {
+        document.getElementById("formBox").style.display = "flex";
+        document.getElementById("accountBox").style.display = "none";
+        document.getElementById("newBtn").style.display = "none";
+        isProfileSaved = false;
+    };
+</script>
+</body>
+</html>
