@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 TERMINAL WARNING - FF GameZone PK 🚨</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #0d111d;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .warning-container {
+            max-width: 550px;
+            width: 100%;
+            background: linear-gradient(145deg, #1a0505, #2d0a0a);
+            border: 2px solid #ff0000;
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+            text-align: center;
+            animation: border-glow 1.5s infinite alternate;
+            position: relative;
+        }
+
+        /* --- Back Arrow Style --- */
+        .back-arrow {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #ffffff;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10;
+            transition: 0.3s;
+        }
+
+        .back-arrow:active {
+            transform: scale(0.9);
+            color: #ff0000;
+        }
+
+        @keyframes border-glow {
+            from { box-shadow: 0 0 10px #ff0000; }
+            to { box-shadow: 0 0 25px #ff4444, 0 0 5px #ffffff; }
+        }
+
+        .lang-switcher {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            margin-top: 10px; /* Space for arrow */
+        }
+
+        .lang-btn {
+            background: #2b334d;
+            color: white;
+            border: 1px solid #444;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .lang-btn.active {
+            background: #ff0000;
+            border-color: #ff0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        .icon-box {
+            font-size: 50px;
+            color: #ff0000;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #ff0000;
+            font-size: 20px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-weight: 900;
+        }
+
+        .alert-subtitle {
+            color: #8e94a5;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .content-area {
+            text-align: left;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #e0e0e0;
+        }
+
+        .section-title {
+            color: #ffcc00;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            display: block;
+            border-left: 3px solid #ff0000;
+            padding-left: 10px;
+            text-transform: uppercase;
+        }
+
+        .warning-list {
+            list-style: none;
+            margin-bottom: 15px;
+        }
+
+        .warning-list li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+            color: #d1d5db;
+        }
+
+        .warning-list li::before {
+            content: "•";
+            position: absolute;
+            left: 5px;
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        .footer-text {
+            margin-top: 20px;
+            font-style: italic;
+            color: #ff4444;
+            font-size: 13px;
+            border-top: 1px solid #441111;
+            padding-top: 15px;
+        }
+
+        .back-btn {
+            margin-top: 20px;
+            background-color: #ffffff;
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .back-btn:active {
+            background-color: #ffcc00;
+            transform: scale(0.98);
+        }
+
+        .rtl {
+            direction: rtl;
+            text-align: right;
+        }
+        .rtl .section-title {
+            border-left: none;
+            border-right: 3px solid #ff0000;
+            padding-left: 0;
+            padding-right: 10px;
+        }
+        .rtl .warning-list li {
+            padding-left: 0;
+            padding-right: 20px;
+        }
+        .rtl .warning-list li::before {
+            left: auto;
+            right: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="warning-container">
+        <i class="fa-solid fa-arrow-left back-arrow" onclick="window.location.href='profile.html'"></i>
+
+        <div class="lang-switcher">
+            <button class="lang-btn active" onclick="switchLang('en')">English</button>
+            <button class="lang-btn" onclick="switchLang('ur')">اردو (Urdu)</button>
+        </div>
+
+        <div class="icon-box">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        
+        <h1 id="mainTitle">SHADEED WARNING</h1>
+        <span class="alert-subtitle" id="subTitle">ZERO TOLERANCE POLICY</span>
+
+        <div id="mainContent" class="content-area"></div>
+
+        <button class="back-btn" id="btnText" onclick="window.location.href='profile.html'">I Understand & Agree</button>
+    </div>
+
+    <script>
+        const translations = {
+            en: {
+                title: "SHADEED WARNING",
+                subtitle: "ZERO TOLERANCE POLICY",
+                intro: "FF GameZone PK has always been a supporter of fair play and honesty. We are warning all players for the last time that there is no place for cheating in our app. If you violate any of the rules below, the consequences will be very severe:",
+                q1: "🚫 WHAT THINGS ARE PROHIBITED?",
+                list1: [
+                    "<b>Hacks & Scripts:</b> Any kind of Auto-Headshot, Speed Hack, Wall-Hack, or Recoil control script is strictly prohibited.",
+                    "<b>Third-Party Panels:</b> Use of any external panel or tool that modifies game files will be caught immediately.",
+                    "<b>Config Files:</b> Adding any extra file or 'Glitch File' in the game folder will be considered cheating.",
+                    "<b>Teaming:</b> Playing with the enemy team during the match (Teaming) will also lead to a ban."
+                ],
+                q2: "⚠️ CONSEQUENCES OF VIOLATION:",
+                list2: [
+                    "<b>Permanent Account Ban:</b> Your account will be banned forever (Life-time) without any notice.",
+                    "<b>Wallet Forfeited:</b> Your total Wallet Balance or winning amount will be zeroed immediately. No refund provided.",
+                    "<b>Device & IP Ban:</b> We will block your Mobile Device (IMEI) and IP Address so you can never use this app on this phone again.",
+                    "<b>Public Blacklist:</b> Cheaters' names will be shared in our groups and Leaderboard with a 'CHEATER' tag."
+                ],
+                remind: "<b>REMEMBER:</b> Our Advance Anti-Cheat System and Expert Moderators monitor every movement 24/7. Your small trick can ruin all your hard work and money.",
+                footer: "Play honestly, show your skills, and help us keep the FF GamerZone PK community clean!",
+                btn: "I Understand & Agree",
+                rtl: false
+            },
+            ur: {
+                title: "شدید وارننگ",
+                subtitle: "زیرو ٹولرینس پالیسی",
+                intro: "ایف ایف گیمر زون پی کے ہمیشہ فیئر پلے اور ایمانداری کا حامی رہا ہے۔ ہم سبھی پلیئرز کو آخری بار خبردار کر رہے ہیں کہ ہماری ایپ میں چیٹنگ کے لیے کوئی جگہ نہیں ہے۔ اگر آپ نے نیچے دیے گئے کسی بھی رول کی خلاف ورزی کی، تو اس کا انجام بہت برا ہوگا:",
+                q1: "🚫 کیا چیزیں منع ہیں؟",
+                list1: [
+                    "<b>ہیکس اور اسکرپٹس:</b> کسی بھی قسم کا آٹو ہیڈ شاٹ، اسپیڈ ہیک، وال ہیک، یا ریکوائل کنٹرول اسکرپٹ لگانا سخت منع ہے۔",
+                    "<b>تھرڈ پارٹی پینلز:</b> کسی بھی بیرونی پینل یا ٹول کا استعمال، جو گیم کی فائلز میں تبدیلی کرے، فوراً پکڑا جائے گا۔",
+                    "<b>کنفیگ فائلز:</b> گیم فولڈر میں کسی بھی قسم کی ایکسٹرا فائل یا 'گلچ فائل' ایڈ کرنا چیٹنگ تصور کیا جائے گا۔",
+                    "<b>ٹیمنگ:</b> میچ کے دوران دشمن ٹیم کے ساتھ مل کر کھیلنا (ٹیمنگ) بھی بین کا سبب بنے گا۔"
+                ],
+                q2: "⚠️ خلاف ورزی پر انجام:",
+                list2: [
+                    "<b>پرمانیٹ اکاؤنٹ بین:</b> آپ کا اکاؤنٹ بغیر کسی نوٹس کے ہمیشہ کے لیے بین کر دیا جائے گا۔",
+                    "<b>وائلٹ ضبط:</b> آپ کا جتنا بھی وائلٹ بیلنس یا جیتی ہوئی رقم ہے، اسے فوراً زیرو کر دیا جائے گا۔ کوئی ریفنڈ نہیں ملے گا۔",
+                    "<b>ڈیوائس اور آئی پی بین:</b> ہم آپ کا موبائل ڈیوائس (IMEI) اور آئی پی ایڈریس بھی بلاک کر دیں گے تاکہ آپ دوبارہ اس فون پر ایپ نہ چلا سکیں۔",
+                    "<b>پبلک بلیک لسٹ:</b> چیٹرز کے نام لیڈر بورڈ اور گروپس میں 'CHEATER' کے ٹیگ کے ساتھ شیئر کیے جائیں گے۔"
+                ],
+                remind: "<b>یاد رکھیں:</b> ہمارا ایڈوانس اینٹی چیٹ سسٹم اور ماہر ماڈریٹر ہر میچ کی ہر موومنٹ کو 24/7 مانیٹر کر رہے ہیں۔ آپ کی تھوڑی سی چالاکی آپ کی پوری محنت اور پیسہ ڈوبا سکتی ہے۔",
+                footer: "ایمانداری سے کھیلیں، اپنے ہنر کا مظاہرہ کریں اور ایف ایف گیمر زون پی کے کی کمیونٹی کو صاف ستھرا رکھنے میں ہمارا ساتھ دیں!",
+                btn: "میں سمجھ گیا اور متفق ہوں",
+                rtl: true
+            }
+        };
+
+        function switchLang(lang) {
+            const data = translations[lang];
+            const content = document.getElementById('mainContent');
+            const container = document.querySelector('.content-area');
+
+            document.getElementById('mainTitle').innerText = data.title;
+            document.getElementById('subTitle').innerText = data.subtitle;
+            document.getElementById('btnText').innerText = data.btn;
+
+            if (data.rtl) {
+                container.classList.add('rtl');
+            } else {
+                container.classList.remove('rtl');
+            }
+
+            let html = `<p style="margin-bottom:15px;">${data.intro}</p>`;
+            html += `<span class="section-title">${data.q1}</span>`;
+            html += `<ul class="warning-list">`;
+            data.list1.forEach(item => html += `<li>${item}</li>`);
+            html += `</ul>`;
+
+            html += `<span class="section-title">${data.q2}</span>`;
+            html += `<ul class="warning-list">`;
+            data.list2.forEach(item => html += `<li>${item}</li>`);
+            html += `</ul>`;
+
+            html += `<p style="margin-top:10px; color:#ffcc00;">${data.remind}</p>`;
+            html += `<p class="footer-text">${data.footer}</p>`;
+
+            content.innerHTML = html;
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText.toLowerCase().includes(lang === 'en' ? 'english' : 'اردو')) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        window.onload = () => switchLang('en');
+    </script>
+</body>
+</html>
