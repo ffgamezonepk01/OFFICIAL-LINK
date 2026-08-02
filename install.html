@@ -1,0 +1,103 @@
+<!-- Bottom Floating Install / Download Banner -->
+<div id="installBanner" class="install-banner">
+    <div class="banner-left">
+        <!-- Yahan apna App Logo ka link lagayein -->
+        <img src="logo.png" alt="App Icon">
+        <div class="banner-text">
+            <h4>FF GamerZone PK</h4>
+            <p>Add to home screen / Download</p>
+        </div>
+    </div>
+    <div class="banner-right">
+        <!-- Install / Download Button (Yahan apni APK file ka link dein) -->
+        <button class="install-btn" onclick="downloadApp()">Install</button>
+        <!-- Close (Cross) Button jo banner ko hata dega -->
+        <button class="close-btn" onclick="closeBanner()">×</button>
+    </div>
+</div>
+
+<style>
+    .install-banner {
+        position: fixed;
+        bottom: 20px; /* Screen ke neche se thoda oper space rakhne ke liye */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 92%;
+        max-width: 450px;
+        background-color: #00c800; /* Green theme color */
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 9999;
+        font-family: Arial, sans-serif;
+    }
+
+    .banner-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .banner-left img {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        object-fit: cover;
+        background: #fff;
+    }
+
+    .banner-text h4 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: bold;
+    }
+
+    .banner-text p {
+        margin: 2px 0 0 0;
+        font-size: 12px;
+        opacity: 0.9;
+    }
+
+    .banner-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .install-btn {
+        background-color: #ffffff;
+        color: #00c800;
+        border: none;
+        padding: 6px 14px;
+        font-weight: bold;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        color: #ffffff;
+        font-size: 22px;
+        cursor: pointer;
+        font-weight: bold;
+        padding: 0 4px;
+    }
+</style>
+
+<script>
+    // Close button function jo banner ko screen se hata dega
+    function closeBanner() {
+        document.getElementById('installBanner').style.display = 'none';
+    }
+
+    // Download button function (Yahan 'your-app-file-link.apk' ki jagah apni file ka direct link daal dein)
+    function downloadApp() {
+        window.location.href = "your-app-file-link.apk"; 
+    }
+</script>
