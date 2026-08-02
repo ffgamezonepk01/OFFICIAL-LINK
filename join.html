@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>FF GameZone PK- My Rooms</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root { 
+            --accent: #ffcc00; 
+            --bg: #0d0d0d; 
+            --card: #1a1a1a; 
+            --success: #2ecc71; 
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            font-family: 'Segoe UI', sans-serif; 
+            padding: 70px 15px 80px 15px; 
+        }
+
+        .app-header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 70px;
+            background: var(--bg); border-bottom: 1px solid #333;
+            display: flex; align-items: center; padding: 0 15px; z-index: 1000;
+        }
+        .header-title { display: flex; align-items: center; gap: 12px; font-weight: 900; font-size: 16px; }
+        .back-btn { color: #fff; font-size: 1.2rem; text-decoration: none; }
+
+        #myRoomsList { display: flex; flex-direction: column; gap: 15px; }
+        .r-card { 
+            background: var(--card); border-radius: 20px; border: 1px solid #333; 
+            padding: 15px; position: relative; overflow: hidden;
+        }
+        .r-tag { 
+            position: absolute; top: 0; right: 0; background: var(--accent); 
+            color: #000; padding: 4px 12px; font-size: 10px; font-weight: 900; 
+            border-bottom-left-radius: 15px; text-transform: uppercase;
+        }
+
+        .r-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 10px; color: var(--accent); }
+        
+        .room-details { 
+            background: #000; border-radius: 12px; padding: 12px; 
+            border: 1px dashed #444; margin-top: 10px;
+        }
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+        .detail-row:last-child { margin-bottom: 0; }
+        .label { color: #888; font-weight: 600; }
+        .value { color: #fff; font-weight: 800; letter-spacing: 1px; }
+
+        .status-badge {
+            display: inline-block; padding: 4px 10px; border-radius: 5px;
+            font-size: 10px; font-weight: 900; margin-top: 10px;
+            text-transform: uppercase;
+        }
+        .status-wait { background: rgba(255, 204, 0, 0.1); color: var(--accent); }
+        .status-live { background: rgba(46, 204, 113, 0.1); color: var(--success); }
+
+        .join-info-box {
+            margin-top: 10px; padding-top: 10px; border-top: 1px solid #333;
+            font-size: 11px; color: #aaa; display: flex; flex-direction: column; gap: 4px;
+        }
+
+        .empty-msg { text-align: center; margin-top: 50px; color: #666; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-title">
+            <a href="profile.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+            <span>MY JOINED ROOMS</span>
+        </div>
+    </header>
+
+    <div id="myRoomsList">
+        <p class="empty-msg">Loading instant...</p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyANjbQLKEpV0Mj5e5PJzCPZvFo8a5vzy_k",
+            authDomain: "ff-tournamint-323ac.firebaseapp.com",
+            databaseURL: "https://ff-tournamint-323ac-default-rtdb.firebaseio.com",
+            projectId: "ff-tournamint-323ac",
+            storageBucket: "ff-tournamint-323ac.firebasestorage.app",
+            messagingSenderId: "157085748163",
+            appId: "1:157085748163:web:848536d10ae58d32398b76",
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) { loadMyRooms(user.uid); } 
+            else { window.location.href = "login-register.html"; }
+        });
+
+        function loadMyRooms(uid) {
+            const listDiv = document.getElementById('myRoomsList');
+            
+            // Firebase "on" listener for instant updates
+            db.ref('registrations').on('value', snap => {
+                listDiv.innerHTML = "";
+                let hasMatches = false;
+
+                snap.forEach(child => {
+                    const data = child.val();
+                    if (data.uid === uid) {
+                        hasMatches = true;
+                        
+                        // Check multiple possible keys for Date and Time
+                        const d = data.joinDate || data.date || "N/A";
+                        const t = data.joinTime || data.time || "";
+                        const statusText = data.roomID ? "MY JOIN TOURNAMENT" : "AWAITING DETAILS";
+
+                        const card = document.createElement('div');
+                        card.className = 'r-card';
+                        card.innerHTML = `
+                            <div class="r-tag">ID: ${data.tourneyNum || '00'}</div>
+                            <div class="r-title">${data.matchTitle}</div>
+                            
+                            <div class="room-details">
+                                <div class="detail-row"><span class="label">ROOM ID</span><span class="value" style="color:var(--accent)">${data.roomID || 'Not Receive...'}</span></div>
+                                <div class="detail-row"><span class="label">PASSWORD</span><span class="value">${data.roomPass || 'Not Receive...'}</span></div>
+                            </div>
+
+                            <div class="join-info-box">
+                                <div class="detail-row"><span class="label">MY Name:</span><span class="value">${data.playerName}</span></div>
+                                <div class="detail-row"><span class="label">MY UID:</span><span class="value">${data.playerUID || 'N/A'}</span></div>
+                                <div style="margin-top:5px; color:var(--accent); font-size:10px;">
+                                    <i class="bi bi-clock-history"></i> Joined on: ${d} ${t}
+                                </div>
+                            </div>
+
+                            <div class="status-badge ${data.roomID ? 'status-live' : 'status-wait'}">
+                                <i class="bi bi-check-circle-fill"></i> ${statusText}
+                            </div>
+                        `;
+                        listDiv.appendChild(card);
+                    }
+                });
+
+                if (!hasMatches) {
+                    listDiv.innerHTML = '<p class="empty-msg">No matches found.</p>';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

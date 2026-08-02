@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Policy - FF GameZone PK</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #0d111d;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .policy-container {
+            max-width: 500px;
+            width: 100%;
+            background: #161b29;
+            border: 1px solid #2c3e50;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+            padding-top: 50px;
+        }
+
+        .back-arrow {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 24px;
+            color: #ffffff;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .back-arrow:hover { color: #ffcc00; }
+
+        .lang-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .lang-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            background: #1a2235;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .lang-btn.active-en { background: #ff0000; color: white; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); }
+        .lang-btn.active-ur { background: #34495e; color: white; box-shadow: 0 0 15px rgba(52, 73, 94, 0.4); }
+
+        .header-icon {
+            text-align: center;
+            font-size: 45px;
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #ffcc00;
+            margin-bottom: 20px;
+            font-size: 22px;
+            text-transform: uppercase;
+        }
+
+        .content {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #d1d5db;
+            min-height: 200px;
+        }
+
+        .highlight { color: #ffcc00; font-weight: bold; }
+
+        .vote-section {
+            margin-top: 25px;
+            border-top: 1px solid #2c3e50;
+            padding-top: 15px;
+            text-align: center;
+        }
+
+        .btn-group { display: flex; gap: 15px; margin-bottom: 20px; }
+
+        .vote-btn {
+            flex: 1;
+            border: 2px solid transparent;
+            padding: 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            background: #1a2235;
+            color: white;
+            transition: 0.3s;
+        }
+
+        .btn-yes.active { 
+            background-color: #2ecc71 !important; 
+            border-color: #ffffff;
+            box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+        }
+
+        .btn-no.active { 
+            background-color: #e74c3c !important; 
+            border-color: #ffffff;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+        }
+
+        .ok-btn {
+            width: 100%;
+            background: #ffcc00;
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        [lang="ur"] { direction: rtl; text-align: right; font-family: 'Tahoma', sans-serif; }
+    </style>
+</head>
+<body>
+
+    <div class="policy-container">
+        <div class="back-arrow" onclick="window.location.href='profile.html'">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+
+        <div class="lang-tabs">
+            <button id="enBtn" class="lang-btn active-en" onclick="switchLang('en')">English</button>
+            <button id="urBtn" class="lang-btn" onclick="switchLang('ur')">اردو (Urdu)</button>
+        </div>
+
+        <div class="header-icon">
+            <i class="fas fa-file-shield"></i>
+        </div>
+
+        <h2 id="policyTitle">App Policy</h2>
+
+        <div id="policyContent" class="content"></div>
+
+        <div class="vote-section">
+            <p id="voteInstruction" style="font-size: 13px; color: #8e94a5; margin-bottom: 10px;"></p>
+            <div class="btn-group">
+                <button id="likeBtn" class="vote-btn btn-yes" onclick="handleVote('like')">
+                    <i class="fas fa-thumbs-up"></i>
+                    <span id="labelLIKE">LIKE</span>
+                    <span id="likeCount" style="font-size: 14px; font-weight: bold; color: #ffcc00;">0</span>
+                </button>
+                
+                <button id="dislikeBtn" class="vote-btn btn-no" onclick="handleVote('dislike')">
+                    <i class="fas fa-thumbs-down"></i>
+                    <span id="labelBADLIKE">BADLIKE</span>
+                    <span id="dislikeCount" style="font-size: 14px; font-weight: bold; color: #ffcc00;">0</span>
+                </button>
+            </div>
+
+            <button class="ok-btn" onclick="window.location.href='profile.html'">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // --- FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyANjbQLKEpV0Mj5e5PJzCPZvFo8a5vzy_k",
+            authDomain: "ff-tournamint-323ac.firebaseapp.com",
+            databaseURL: "https://ff-tournamint-323ac-default-rtdb.firebaseio.com",
+            projectId: "ff-tournamint-323ac",
+            storageBucket: "ff-tournamint-323ac.firebasestorage.app",
+            appId: "1:157085748163:web:848536d10ae58d32398b76"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.database();
+
+        const translations = {
+            en: {
+                title: "App Policy",
+                text: `<span class="highlight">FF GameZone PK</span> is a platform where every Free Fire player can earn money. We also care for players who can't play Battle Royale or Clash Squad, so we brought <span class="highlight">Lone Wolf Customs</span>. Just join the room, get Booyah and win your prize.<br><br>Refer your friends to get more rewards. <span class="highlight">Withdraw and Deposit</span> is very easy via JazzCash or EasyPaisa. Our team approves requests quickly. If you enter a wrong number, don't worry, contact support and we will refund within 24 hours. Your single rupee won't be wasted.`,
+                instruction: "If you like our app tap LIKE, if not tap BADLIKE",
+                tik: "LIKE",
+                dosra: "BADLIKE"
+            },
+            ur: {
+                title: "ایپ پالیسی",
+                text: `<span class="highlight">FF GameZone PK</span> ایک ایسا پلیٹ فارم ہے جہاں ہر فری فائر پلیئر اپنی مہارت سے پیسے کما سکتا ہے۔ ہم نے ان دوستوں کا بھی خیال رکھا ہے جو بیٹل رائل یا کلیش اسکواڈ نہیں کھیل سکتے، ان کے لیے ہم <span class="highlight">لون ولف کسٹمز</span> لائے ہیں۔ بس روم جوائن کریں، بویاہ کریں اور اپنا انعام جیتیں۔<br><br>اپنے دوستوں کو ریفر کر کے مزید انعامات حاصل کریں۔ <span class="highlight">جاز کیش یا ایزی پیسہ</span> سے رقم نکالنا اور ڈالنا بہت آسان ہے۔ ہماری ٹیم جلد از جلد آپ کی درخواست منظور کرتی ہے۔ اگر آپ غلطی سے غلط نمبر لکھ دیں تو فکر نہ کریں، سپورٹ سے رابطہ کریں، ہم 24 گھنٹے میں رقم ریفنڈ کر دیں گے۔ آپ کا ایک روپیہ بھی ضائع نہیں ہوگا۔`,
+                instruction: "اگر آپ کو ہماری ایپ پسند آئی ہے تو ٹک پر دبائیں ورنہ دوسرا پر دبائیں",
+                tik: "ٹک",
+                dosra: "دوسرا"
+            }
+        };
+
+        let currentLang = 'en';
+        let userSelection = localStorage.getItem('appPolicyVote') || null;
+
+        // Pehle se maujood counts load karna aur real-time update rakhna
+        db.ref('policy_stats').on('value', (snapshot) => {
+            const data = snapshot.val() || { likes: 0, dislikes: 0 };
+            document.getElementById('likeCount').innerText = data.likes;
+            document.getElementById('dislikeCount').innerText = data.dislikes;
+            updateButtonStyles();
+        });
+
+        function switchLang(lang) {
+            currentLang = lang;
+            const container = document.getElementById('policyContent');
+            const enBtn = document.getElementById('enBtn');
+            const urBtn = document.getElementById('urBtn');
+
+            if (lang === 'ur') {
+                container.setAttribute('lang', 'ur');
+                enBtn.classList.remove('active-en');
+                urBtn.classList.add('active-ur');
+            } else {
+                container.removeAttribute('lang');
+                urBtn.classList.remove('active-ur');
+                enBtn.classList.add('active-en');
+            }
+
+            document.getElementById('policyTitle').innerText = translations[lang].title;
+            container.innerHTML = translations[lang].text;
+            document.getElementById('voteInstruction').innerText = translations[lang].instruction;
+            document.getElementById('labelTik').innerText = translations[lang].tik;
+            document.getElementById('labelDosra').innerText = translations[lang].dosra;
+        }
+
+        function handleVote(type) {
+            const statsRef = db.ref('policy_stats');
+            
+            statsRef.transaction((currentData) => {
+                if (!currentData) currentData = { likes: 0, dislikes: 0 };
+
+                if (type === 'like') {
+                    // Agar pehle se like kiya hua hai to remove karde (Toggle)
+                    if (userSelection === 'like') {
+                        currentData.likes = Math.max(0, (currentData.likes || 0) - 1);
+                        userSelection = null;
+                    } else {
+                        // Agar pehle dislike kiya tha to dislike kam kare
+                        if (userSelection === 'dislike') currentData.dislikes = Math.max(0, (currentData.dislikes || 0) - 1);
+                        currentData.likes = (currentData.likes || 0) + 1;
+                        userSelection = 'like';
+                    }
+                } else {
+                    // Dislike logic
+                    if (userSelection === 'dislike') {
+                        currentData.dislikes = Math.max(0, (currentData.dislikes || 0) - 1);
+                        userSelection = null;
+                    } else {
+                        if (userSelection === 'like') currentData.likes = Math.max(0, (currentData.likes || 0) - 1);
+                        currentData.dislikes = (currentData.dislikes || 0) + 1;
+                        userSelection = 'dislike';
+                    }
+                }
+                
+                localStorage.setItem('appPolicyVote', userSelection);
+                return currentData;
+            });
+        }
+
+        function updateButtonStyles() {
+            document.getElementById('likeBtn').classList.toggle('active', userSelection === 'like');
+            document.getElementById('dislikeBtn').classList.toggle('active', userSelection === 'dislike');
+        }
+
+        window.onload = () => {
+            switchLang('en');
+        };
+    </script>
+</body>
+</html>

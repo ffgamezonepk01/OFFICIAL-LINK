@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>FF GameZone PK - Edit Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root { 
+            --accent: #ffcc00; 
+            --bg: #0F0C29; 
+            --card: #1A1A3C; 
+            --danger: #FF4C60;
+        }
+
+        /* --- TAP EFFECT REMOVAL --- */
+        * {
+            -webkit-tap-highlight-color: transparent; /* Mobile tap color khatam */
+            outline: none !important; /* Blue/Gray outline khatam */
+        }
+
+        body { 
+            background-color: var(--bg); 
+            color: white; 
+            font-family: 'Segoe UI', sans-serif; 
+            text-align: center; 
+            padding: 0; 
+            margin: 0; 
+            height: 100vh;
+            overflow: hidden; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+        }
+
+        .back-btn {
+            background: var(--card);
+            border: 1px solid #333;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .container { 
+            flex: 1;
+            padding: 0 15px 10px 15px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; 
+        }
+        
+        h2 { font-size: 18px; margin: 5px 0; color: var(--accent); letter-spacing: 1px; }
+
+        .profile-container {
+            width: 85px; height: 85px; 
+            border-radius: 50%; 
+            border: 3px solid var(--danger); 
+            margin: 0 auto; 
+            overflow: hidden;
+            background: #000; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #profile-img { width: 100%; height: 100%; object-fit: cover; display: none; }
+        #profile-letter { font-size: 40px; font-weight: 900; color: var(--accent); text-transform: uppercase; }
+        
+        .label { display: block; margin: 8px 0 4px 0; font-size: 10px; color: #4ed1ff; font-weight: bold; letter-spacing: 1px; }
+
+        .file-upload-label {
+            display: block; width: 85%; max-width: 280px; 
+            margin: 0 auto; padding: 8px;
+            background: #2c3e50; color: white;
+            border-radius: 10px; border: 1px dashed var(--accent);
+            cursor: pointer; font-size: 11px;
+        }
+        #gallery-input { display: none; }
+
+        .avatar-section { 
+            position: relative; 
+            width: 100%; 
+            max-width: 350px; 
+            margin: 0 auto; 
+            padding: 5px 0;
+        }
+
+        .grid-wrapper {
+            position: relative;
+            background: var(--card); 
+            border-radius: 15px;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+
+        .avatar-grid { 
+            display: grid; 
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 6px; 
+            padding: 15px; 
+            max-height: 125px; 
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        
+        .scroll-arrow {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px; 
+            height: 45px; 
+            background: #000000; 
+            z-index: 10;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .arrow-down {
+            bottom: 2px;
+            clip-path: polygon(35% 0%, 65% 0%, 65% 70%, 100% 70%, 50% 100%, 0% 70%, 35% 70%);
+        }
+
+        .arrow-up {
+            top: 2px;
+            clip-path: polygon(50% 0%, 100% 30%, 65% 30%, 65% 100%, 35% 100%, 35% 30%, 0% 30%);
+            opacity: 0; 
+        }
+
+        .grid-avatar { width: 100%; aspect-ratio: 1/1; border-radius: 50%; cursor: pointer; border: 2px solid transparent; object-fit: cover; }
+        .grid-avatar.selected { border-color: #2ecc71; transform: scale(1.05); }
+
+        input#new-name { 
+            width: 85%; max-width: 280px; padding: 12px; border-radius: 10px; 
+            background: var(--card); color: white; border: 1px solid #333; margin: 0 auto; text-align: center;
+            outline: none; font-size: 13px;
+        }
+
+        .action-btn { 
+            width: 90%; max-width: 300px; padding: 14px; margin: 10px auto; 
+            border: none; border-radius: 12px; background: var(--danger); color: white; 
+            font-weight: 900; cursor: pointer; text-transform: uppercase;
+            font-size: 14px;
+        }
+        
+        .avatar-grid::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <button class="back-btn" onclick="history.back()">
+            <i class="fas fa-chevron-left"></i> BACK
+        </button>
+    </div>
+
+    <div class="container">
+        <h2>EDIT PROFILE</h2>
+        
+        <div class="profile-container" id="profile-box">
+            <img id="profile-img" src="" alt="Preview">
+            <span id="profile-letter"></span>
+        </div>
+        
+        <div>
+            <div class="label">UPLOAD FROM GALLERY</div>
+            <label for="gallery-input" class="file-upload-label">
+                <i class="fas fa-image"></i> CHOOSE FROM GALLERY
+            </label>
+            <input type="file" id="gallery-input" accept="image/*" onchange="previewGalleryImage(this)">
+        </div>
+
+        <div class="avatar-section">
+            <div class="label">SELECT AN AVATAR</div>
+            <div class="grid-wrapper">
+                <div id="arrow-up" class="scroll-arrow arrow-up"></div>
+                
+                <div class="avatar-grid" id="avatarGrid">
+                    <img src="https://i.ibb.co/DDy0FGDw/file-00000000647471fa8253d1fd3cf4baad.jpg" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/RTL41s15/30ea4555-8526-4a2a-804b-584955aa7b6d.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/TM84xvLx/33b4e014-75e6-4cda-bdb1-c791d860bf72.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/p61QkVfQ/89aa869e-d952-44a2-91e9-e25eb134dbbd.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/N5jHKk8/b13f89d5-c2eb-4be3-9567-17dc05f30a27.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/jkFV3RQ3/9c1e612b-d046-409f-a85f-f657fe948539.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/TDczyCLr/9ac3fe17-55fa-47d7-bfbe-839c5a13bf99.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/dwJCf2mC/7c2e0712-5ab0-49e3-91d4-e75a95c502df.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/qM7BMy5N/46cae860-443d-4413-9988-cbeb0bdfe2e1.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/RGvXSRjW/aeb41334-cfde-4a48-bbec-df9798b5b400.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/zvC0zj1/e93d2493-9bd8-46ed-ac19-7ff231e27972.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/Df0V8pWy/7da43978-2db6-4303-ba9a-ab057b89c08f.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/nNkzrvFy/2f4adee4-c13c-4e5f-a5ba-c57a4bc355ca.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/NgtmXsGz/4feac5fe-a460-46c9-b52f-c7b47d506f4c.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/6RDrCVPq/53a02a35-5578-4839-bd89-05be04855230.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/3mwxPKfn/b3e58902-ca61-4d0b-b37a-d4bcb9886cff.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/RWCHxP6/1c8591a8-8705-404c-97fd-98bac5a7b8f0.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/GvbGQp6P/f112e6f8-02da-40a3-8ab3-fd421ae05aa5.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/zhFQ6WKp/8c56a066-9850-4e5b-ab86-7340d13a7322.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/99ZBGWH5/7601f578-085c-47bf-8fac-a99e118fbfa1.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/HLs3L602/d014e127-9b2e-4021-9f1a-3d2487ec3a86.png" class="grid-avatar" onclick="selectAvatar(this)">
+                    <img src="https://i.ibb.co/mVqNQd8x/7c25959e-8d84-4d8a-8e26-dbf20b6485bd.png" class="grid-avatar" onclick="selectAvatar(this)">
+                </div>
+
+                <div id="arrow-down" class="scroll-arrow arrow-down"></div>
+            </div>
+        </div>
+
+        <div>
+            <div class="label">DISPLAY NAME</div>
+            <input type="text" id="new-name" placeholder="Enter Name...">
+        </div>
+
+        <input type="hidden" id="selected-avatar-url">
+        <button class="action-btn" onclick="updateProfile()">SAVE CHANGES</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyANjbQLKEpV0Mj5e5PJzCPZvFo8a5vzy_k",
+            authDomain: "ff-tournamint-323ac.firebaseapp.com",
+            databaseURL: "https://ff-tournamint-323ac-default-rtdb.firebaseio.com",
+            projectId: "ff-tournamint-323ac",
+            storageBucket: "ff-tournamint-323ac.firebasestorage.app",
+            appId: "1:157085748163:web:848536d10ae58d32398b76"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+
+        const pImg = document.getElementById('profile-img');
+        const pLetter = document.getElementById('profile-letter');
+        const nameInput = document.getElementById('new-name');
+        const hiddenInput = document.getElementById('selected-avatar-url');
+
+        const cachedName = localStorage.getItem('user_name');
+        const cachedPic = localStorage.getItem('user_pic');
+        const cachedEmail = localStorage.getItem('user_email');
+
+        if (cachedPic) {
+            pImg.src = cachedPic;
+            pImg.style.display = "block";
+            pLetter.style.display = "none";
+            hiddenInput.value = cachedPic;
+        } else if (cachedEmail) {
+            pLetter.innerText = cachedEmail.charAt(0).toUpperCase();
+            pLetter.style.display = "block";
+        }
+
+        if (cachedName) nameInput.value = cachedName;
+
+        const grid = document.getElementById('avatarGrid');
+        const arrowUp = document.getElementById('arrow-up');
+        const arrowDown = document.getElementById('arrow-down');
+
+        grid.addEventListener('scroll', () => {
+            const currentScroll = grid.scrollTop;
+            const maxScroll = grid.scrollHeight - grid.clientHeight;
+            arrowUp.style.opacity = currentScroll > 20 ? "1" : "0";
+            arrowDown.style.opacity = currentScroll < (maxScroll - 20) ? "1" : "0";
+        });
+
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                if (!cachedPic && !pLetter.innerText) {
+                    pLetter.innerText = user.email.charAt(0).toUpperCase();
+                }
+                
+                database.ref('users/' + user.uid).once('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if(data) {
+                        if(data.profilePic) {
+                            pImg.src = data.profilePic;
+                            pImg.style.display = "block";
+                            pLetter.style.display = "none";
+                            hiddenInput.value = data.profilePic;
+                            localStorage.setItem('user_pic', data.profilePic);
+                        }
+                        if(data.displayName) {
+                            nameInput.value = data.displayName;
+                            localStorage.setItem('user_name', data.displayName);
+                        }
+                    }
+                });
+            }
+        });
+
+        function previewGalleryImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgObj = new Image();
+                    imgObj.src = e.target.result;
+                    imgObj.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const maxSize = 200; 
+                        let width = imgObj.width;
+                        let height = imgObj.height;
+                        if (width > height) { if (width > maxSize) { height *= maxSize / width; width = maxSize; } } 
+                        else { if (height > maxSize) { width *= maxSize / height; height = maxSize; } }
+                        canvas.width = width; canvas.height = height;
+                        ctx.drawImage(imgObj, 0, 0, width, height);
+                        const compressedData = canvas.toDataURL('image/jpeg', 0.7);
+                        pImg.src = compressedData;
+                        pImg.style.display = "block";
+                        pLetter.style.display = "none";
+                        hiddenInput.value = compressedData;
+                    };
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function selectAvatar(element) {
+            const avatars = document.querySelectorAll('.grid-avatar');
+            avatars.forEach(av => av.classList.remove('selected'));
+            element.classList.add('selected');
+            pImg.src = element.src;
+            pImg.style.display = "block";
+            pLetter.style.display = "none";
+            hiddenInput.value = element.src;
+        }
+
+        function updateProfile() {
+            const btn = document.querySelector('.action-btn');
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+
+            const name = nameInput.value;
+            const photoUrl = hiddenInput.value;
+
+            btn.innerText = "SAVING...";
+            btn.disabled = true;
+
+            database.ref('users/' + user.uid).update({
+                displayName: name || "Gamer",
+                profilePic: photoUrl || ""
+            }).then(() => {
+                localStorage.setItem('user_name', name || "Gamer");
+                localStorage.setItem('user_pic', photoUrl || "");
+                window.location.href = "profile.html";
+            }).catch(err => {
+                btn.innerText = "SAVE CHANGES";
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>

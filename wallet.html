@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Wallet - FF GAME ZONE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0f0f1e;
+            --bg-secondary: #1a1a2e;
+            --accent-yellow: #f5a623;
+            --jazz-yellow: #f5a623;
+            --ep-green: #2ecc71;
+            --text-primary: #ffffff;
+        }
+
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            outline: none !important;
+        }
+
+        body { background-color: var(--bg-primary); color: var(--text-primary); font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
+        
+        /* --- REDESIGNED STYLISH HEADER --- */
+        .wallet-header { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            padding: 16px 20px; 
+            background: linear-gradient(135deg, #1a1a2e, #131324);
+            border-bottom: 1.5px solid rgba(245, 166, 35, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .wallet-header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn { 
+            background: rgba(245, 166, 35, 0.1); 
+            border: 1px solid rgba(245, 166, 35, 0.3); 
+            color: var(--accent-yellow); 
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 1.1rem; 
+            cursor: pointer; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:active {
+            transform: scale(0.92);
+            background: rgba(245, 166, 35, 0.25);
+        }
+
+        .header-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-wallet-icon {
+            font-size: 1.3rem;
+            color: var(--accent-yellow);
+            background: rgba(245, 166, 35, 0.12);
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid rgba(245, 166, 35, 0.25);
+        }
+
+        .wallet-header h2 {
+            font-size: 18px; 
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: #fff;
+            text-transform: uppercase;
+        }
+        
+        /* --- LARGER BOUNCING BALANCE CARD DESIGN --- */
+        .balance-card { 
+            background: linear-gradient(145deg, #1f1f3a, #16162a);
+            margin: 24px 20px; 
+            padding: 30px 24px; 
+            border-radius: 28px; 
+            border: 1.5px solid rgba(245, 166, 35, 0.4);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(245, 166, 35, 0.15);
+            position: relative;
+            animation: bounceCard 3s ease-in-out infinite;
+        }
+
+        @keyframes bounceCard {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .balance-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+
+        .balance-label-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .balance-label-container::before {
+            content: '';
+            width: 4px;
+            height: 14px;
+            background-color: var(--accent-yellow);
+            display: inline-block;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+
+        .balance-title {
+            color: #ccc;
+            font-weight: 800;
+            font-size: 12px;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+        }
+
+        .wallet-icon-box {
+            font-size: 2.4rem;
+            color: var(--accent-yellow);
+            filter: drop-shadow(0 0 12px rgba(245, 166, 35, 0.5));
+        }
+
+        .balance-amount-row {
+            margin-bottom: 10px;
+        }
+
+        #displayBalance {
+            font-size: 38px;
+            font-weight: 900;
+            color: var(--accent-yellow);
+            text-shadow: 0 0 20px rgba(245, 166, 35, 0.4);
+            letter-spacing: 0.5px;
+        }
+
+        .balance-update-text {
+            font-size: 13px;
+            color: #999;
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+
+        .balance-actions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .balance-action-btn {
+            background-color: var(--bg-primary);
+            border: 1px solid rgba(245, 166, 35, 0.3);
+            color: white;
+            padding: 16px;
+            border-radius: 18px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .balance-action-btn.deposit-primary-btn {
+            background: linear-gradient(135deg, #f5a623, #d48c00);
+            color: #000;
+            border: none;
+            box-shadow: 0 6px 18px rgba(245, 166, 35, 0.35);
+        }
+
+        .balance-action-btn i {
+            font-size: 1.2rem;
+        }
+
+        .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px 20px 20px; }
+        .action-btn { background-color: var(--bg-secondary); border: 1px solid #333; color: white; padding: 15px 10px; border-radius: 16px; text-align: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #aaa; }
+        .action-btn span { display: block; font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
+
+        /* Transaction History Section */
+        .history-section {
+            padding: 0 20px 30px 20px;
+        }
+
+        .history-section-title-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .history-section-title-row::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background-color: var(--accent-yellow);
+            display: inline-block;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+
+        .history-section-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-tabs {
+            background: var(--bg-secondary);
+            border: 1px solid #333;
+            border-radius: 18px;
+            padding: 6px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+
+        .filter-tab {
+            background: transparent;
+            border: none;
+            color: #aaa;
+            padding: 10px 5px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .filter-tab.active {
+            background: var(--bg-primary);
+            color: var(--accent-yellow);
+            border: 1px solid rgba(245, 166, 35, 0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .empty-history-box {
+            background: var(--bg-secondary);
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px 20px;
+            text-align: center;
+            color: #777;
+        }
+
+        .empty-history-box i {
+            font-size: 2.5rem;
+            color: var(--accent-yellow);
+            opacity: 0.5;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .empty-history-box p {
+            font-size: 13px;
+            font-weight: 600;
+            color: #888;
+        }
+
+        .history-item { 
+            background: var(--bg-secondary); 
+            padding: 16px; 
+            border-radius: 16px; 
+            margin-bottom: 12px; 
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--accent-yellow); 
+        }
+        .history-item.rejected-history { border-left-color: #e74c3c !important; }
+        .history-ss { width: 100%; max-height: 120px; object-fit: contain; border-radius: 8px; margin-top: 8px; border: 1px solid #333; background: #000; cursor: pointer; }
+
+        .sub-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-primary); z-index: 2000; overflow-y: auto; padding-bottom: 30px; }
+        .container { padding: 20px; }
+
+        .feedback-msg { padding: 12px; border-radius: 10px; font-size: 13px; margin-bottom: 15px; display: none; text-align: center; font-weight: bold; }
+        .msg-success { background: rgba(46, 204, 113, 0.15); color: #2ecc71; border: 1px solid #2ecc71; }
+        .msg-error { background: rgba(231, 76, 60, 0.15); color: #ff4d4d; border: 1px solid #ff4d4d; }
+
+        .big-success-msg {
+            background: #2ecc71;
+            color: #000;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+            border: 2px solid #fff;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .account-folder { background: #252545; padding: 18px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-bottom: 20px; border: 1px dashed var(--accent-yellow); }
+
+        input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #333; background: var(--bg-secondary); color: white; box-sizing: border-box; font-size: 14px; margin-bottom: 15px;}
+        input:focus { border-color: var(--accent-yellow); }
+
+        .method-selector { display: flex; gap: 12px; margin-bottom: 20px; }
+        .method-card { 
+            flex: 1; background: var(--bg-secondary); padding: 18px 15px; border-radius: 15px; 
+            text-align: center; border: 2px solid transparent; cursor: pointer; 
+        }
+        .method-card.selected { border-color: var(--accent-yellow); background: rgba(245, 166, 35, 0.1); }
+        
+        .method-logo-img { width: 55px; height: 55px; object-fit: contain; border-radius: 50%; margin: 0 auto 10px; display: block; background: #000; border: 1px solid #333; }
+
+        .submit-btn { width: 100%; background: var(--accent-yellow); color: #000; border: none; padding: 16px; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        .deposit-step { display: none; }
+        .deposit-step.active-step { display: block; }
+
+        .deposit-box-info { background: #1e1e3a; border-radius: 20px; padding: 25px; text-align: center; border: 1px solid var(--accent-yellow); margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="mainWallet">
+        <div class="wallet-header">
+            <div class="wallet-header-left">
+                <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i></button>
+                <div class="header-title-wrapper">
+                    <div class="header-wallet-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <h2>MY WALLET</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="balance-card">
+            <div class="balance-top-row">
+                <div class="balance-label-container">
+                    <span class="balance-title">Available Balance</span>
+                </div>
+                <div class="wallet-icon-box">
+                    <i class="fas fa-wallet"></i>
+                </div>
+            </div>
+            
+            <div class="balance-amount-row">
+                <h1 id="displayBalance">Loading...</h1>
+            </div>
+            <div class="balance-update-text">Updated just now</div>
+
+            <div class="balance-actions-grid">
+                <div class="balance-action-btn deposit-primary-btn" onclick="showPage('depositPage')">
+                    <i class="fas fa-arrow-circle-down"></i> Deposit
+                </div>
+                <div class="balance-action-btn" onclick="showPage('withdrawPage')">
+                    <i class="fas fa-arrow-circle-up"></i> Withdraw
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <div class="action-btn"><span id="statDepositsCount">0</span> Deposits</div>
+            <div class="action-btn"><span id="statWithdrawalsCount">0</span> Withdrawals</div>
+            <div class="action-btn"><span id="statApprovedCount">0</span> Approved</div>
+        </div>
+
+        <div class="history-section">
+            <div class="history-section-title-row">
+                <span class="history-section-title">Transaction History</span>
+            </div>
+            
+            <div class="filter-tabs">
+                <button class="filter-tab active" id="tabAll" onclick="filterHistory('all')">
+                    <i class="fas fa-list"></i> All
+                </button>
+                <button class="filter-tab" id="tabDeposit" onclick="filterHistory('deposit')">
+                    <i class="fas fa-arrow-circle-down"></i> Deposit
+                </button>
+                <button class="filter-tab" id="tabWithdraw" onclick="filterHistory('withdraw')">
+                    <i class="fas fa-arrow-circle-up"></i> Withdraw
+                </button>
+            </div>
+
+            <div id="unifiedHistoryList">
+                <div class="empty-history-box">
+                    <i class="fas fa-receipt"></i>
+                    <p>No history</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="depositPage" class="sub-page">
+        <div class="wallet-header">
+            <div class="wallet-header-left">
+                <button class="back-btn" onclick="hidePage('depositPage')"><i class="fas fa-arrow-left"></i></button>
+                <div class="header-title-wrapper">
+                    <div class="header-wallet-icon"><i class="fas fa-arrow-circle-down"></i></div>
+                    <h2>Deposit</h2>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div id="depStatusMsg" class="feedback-msg"></div>
+            
+            <div id="depStep1" class="deposit-step active-step">
+                <p style="font-size: 14px; margin-bottom: 15px; font-weight: bold; color: #ccc;">Select Payment Method:</p>
+                <div class="method-selector">
+                    <div class="method-card" id="depCardJC" onclick="selDepMethod('JazzCash')">
+                        <img src="https://i.ibb.co/svnPfnbR/file-000000006bcc81fd839c55d076e522f7.png" class="method-logo-img" alt="JazzCash">
+                        <span style="font-weight: bold; font-size: 13px;">JazzCash</span>
+                    </div>
+                    <div class="method-card" id="depCardEP" onclick="selDepMethod('EasyPaisa')">
+                        <img src="https://i.ibb.co/Zz0hY5pd/file-000000001c388230825af4133215f18c.png" class="method-logo-img" alt="EasyPaisa">
+                        <span style="font-weight: bold; font-size: 13px;">EasyPaisa</span>
+                    </div>
+                </div>
+
+                <input type="number" id="depAmount" placeholder="Enter Amount (RS)">
+                <p style="color:var(--accent-yellow); font-size:11px; margin-top: -10px; margin-bottom:20px; font-weight: bold;">* Minimum 50 RS required for deposit</p>
+
+                <button class="submit-btn" onclick="proceedToDepStep2()">Next</button>
+            </div>
+
+            <div id="depStep2" class="deposit-step">
+                <div class="deposit-box-info" id="depInfoBox"></div>
+
+                <input type="text" id="depTID" placeholder="Transaction ID (TID)">
+                <p style="font-size:12px; color:#aaa; margin-bottom: 8px;"><i class="fas fa-image"></i> Upload Screenshot:</p>
+                <input type="file" id="depFile" accept="image/*">
+                
+                <div style="display: flex; gap: 10px; margin-top:25px;">
+                    <button class="submit-btn" style="background: #333; color: #fff;" onclick="backToDepStep1()">Back</button>
+                    <button class="submit-btn" id="btnDeposit">Submit Deposit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="withdrawPage" class="sub-page">
+        <div class="wallet-header">
+            <div class="wallet-header-left">
+                <button class="back-btn" onclick="hidePage('withdrawPage')"><i class="fas fa-arrow-left"></i></button>
+                <div class="header-title-wrapper">
+                    <div class="header-wallet-icon"><i class="fas fa-arrow-circle-up"></i></div>
+                    <h2>Withdraw</h2>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div id="witSuccessMsg" class="big-success-msg">
+                WITHDRAW SUCCESSFUL<br>
+                PLEASE WAIT AND RECEIVE YOU
+            </div>
+
+            <div class="account-folder" onclick="showPage('accountPage')">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <img id="accLogoImg" src="" style="width: 40px; height: 40px; object-fit: contain; border-radius: 50%; background: #000; border: 1px solid #333; display: none;" alt="Logo">
+                    <div>
+                        <b id="accStatusName" style="font-size: 14px; display: block; color: #fff;">Set Withdraw Account</b>
+                        <span id="accStatusNum" style="font-size: 12px; color: var(--accent-yellow); display: none;"></span>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right" style="font-size: 12px;"></i>
+            </div>
+            <input type="number" id="witAmount" placeholder="Enter Amount to Withdraw">
+            <p style="color:var(--accent-yellow); font-size:11px; margin-bottom:15px;">* Minimum 500 RS required</p>
+            <button class="submit-btn" id="btnWithdraw">Withdraw Now</button>
+        </div>
+    </div>
+
+    <div id="accountPage" class="sub-page" style="z-index:3000;">
+        <div class="wallet-header">
+            <div class="wallet-header-left">
+                <button class="back-btn" onclick="hidePage('accountPage')"><i class="fas fa-arrow-left"></i></button>
+                <div class="header-title-wrapper">
+                    <div class="header-wallet-icon"><i class="fas fa-user-cog"></i></div>
+                    <h2>Set Account</h2>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="method-selector">
+                <div class="method-card" id="cardJC" onclick="selMethod('JazzCash')">
+                    <img src="https://i.ibb.co/svnPfnbR/file-000000006bcc81fd839c55d076e522f7.png" class="method-logo-img" alt="JazzCash">
+                    <span style="font-weight: bold; font-size: 13px;">JazzCash</span>
+                </div>
+                <div class="method-card" id="cardEP" onclick="selMethod('EasyPaisa')">
+                    <img src="https://i.ibb.co/Zz0hY5pd/file-000000001c388230825af4133215f18c.png" class="method-logo-img" alt="EasyPaisa">
+                    <span style="font-weight: bold; font-size: 13px;">EasyPaisa</span>
+                </div>
+            </div>
+            <input type="text" id="accName" placeholder="Account Holder Name">
+            <input type="number" id="accNum" placeholder="Account Number (03xxxxxxxxx)" oninput="validateNum(this)">
+            <p id="numError" style="color: #ff4d4d; font-size: 11px; display: none; margin-bottom: 10px;">Glat Number! 11 digits likhein.</p>
+            <button class="submit-btn" onclick="saveAccount()">Save Account</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getDatabase, ref, onValue, set, push, serverTimestamp, query, orderByChild, equalTo, get } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyANjbQLKEpV0Mj5e5PJzCPZvFo8a5vzy_k",
+            authDomain: "ff-tournamint-323ac.firebaseapp.com",
+            databaseURL: "https://ff-tournamint-323ac-default-rtdb.firebaseio.com",
+            projectId: "ff-tournamint-323ac",
+            storageBucket: "ff-tournamint-323ac.firebasestorage.app",
+            appId: "1:157085748163:web:848536d10ae58d32398b76"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        let userBalance = 0, currentUser = null, selectedMethod = "", selectedDepMethod = "";
+        let allDepositsData = [];
+        let allWithdrawalsData = [];
+        let currentFilter = 'all';
+
+        window.showPage = (id) => document.getElementById(id).style.display = "block";
+        window.hidePage = (id) => document.getElementById(id).style.display = "none";
+        
+        window.selMethod = (m) => {
+            selectedMethod = m;
+            document.getElementById('cardJC').classList.toggle('selected', m === 'JazzCash');
+            document.getElementById('cardEP').classList.toggle('selected', m === 'EasyPaisa');
+        };
+
+        window.selDepMethod = (m) => {
+            selectedDepMethod = m;
+            document.getElementById('depCardJC').classList.toggle('selected', m === 'JazzCash');
+            document.getElementById('depCardEP').classList.toggle('selected', m === 'EasyPaisa');
+        };
+
+        window.proceedToDepStep2 = () => {
+            const amount = parseFloat(document.getElementById('depAmount').value);
+            if(!selectedDepMethod) return showStatus("Please select a deposit method (JazzCash or EasyPaisa)!", "error");
+            if(!amount || amount < 50) return showStatus("Minimum 50 RS required for deposit!", "error");
+
+            document.getElementById('depStatusMsg').style.display = "none";
+
+            const accName = selectedDepMethod === 'JazzCash' ? 'MUHAMMAD SAQIB' : 'REHMAT JAN';
+            const logoUrl = selectedDepMethod === 'JazzCash' ? 'https://i.ibb.co/svnPfnbR/file-000000006bcc81fd839c55d076e522f7.png' : 'https://i.ibb.co/Zz0hY5pd/file-000000001c388230825af4133215f18c.png';
+            
+            document.getElementById('depInfoBox').innerHTML = `
+                <img src="${logoUrl}" style="width: 65px; height: 65px; object-fit: contain; border-radius: 50%; margin: 0 auto 12px; display: block; background: #000; border: 1px solid #333;">
+                <h2 style="color:var(--accent-yellow); margin-bottom:5px; font-weight: 900;">${selectedDepMethod}</h2>
+                <p style="font-size: 13px; opacity: 0.8;">Is number par payment bhejein:</p>
+                <h3 style="letter-spacing: 2px; margin:10px 0; font-size: 22px; color: #fff;">03275703761</h3>
+                <p style="font-size: 14px;">Name: <b style="color: var(--accent-yellow);">${accName}</b></p>
+                <p style="font-size: 13px; margin-top: 10px; color: #2ecc71;">Amount: <b>RS. ${amount}</b></p>
+            `;
+
+            document.getElementById('depStep1').classList.remove('active-step');
+            document.getElementById('depStep2').classList.add('active-step');
+        };
+
+        window.backToDepStep1 = () => {
+            document.getElementById('depStep2').classList.remove('active-step');
+            document.getElementById('depStep1').classList.add('active-step');
+        };
+
+        window.validateNum = (el) => {
+            const regex = /^(03)[0-9]{9}$/;
+            document.getElementById('numError').style.display = regex.test(el.value) ? "none" : "block";
+        };
+
+        window.saveAccount = () => {
+            const name = document.getElementById('accName').value.trim();
+            const num = document.getElementById('accNum').value;
+            if(!selectedMethod || !name || num.length < 11) return alert("Sahi details bharein!");
+            localStorage.setItem('savedAcc', JSON.stringify({selectedMethod, name, num}));
+            updateAccountUI();
+            alert("Account Details Saved!");
+            hidePage('accountPage');
+        };
+
+        function updateAccountUI() {
+            const saved = JSON.parse(localStorage.getItem('savedAcc'));
+            if(saved) {
+                const logoUrl = saved.selectedMethod === 'JazzCash' ? 'https://i.ibb.co/svnPfnbR/file-000000006bcc81fd839c55d076e522f7.png' : 'https://i.ibb.co/Zz0hY5pd/file-000000001c388230825af4133215f18c.png';
+                document.getElementById('accLogoImg').src = logoUrl;
+                document.getElementById('accLogoImg').style.display = "block";
+                document.getElementById('accStatusName').innerText = saved.selectedMethod + " (" + saved.name + ")";
+                document.getElementById('accStatusNum').innerText = saved.num;
+                document.getElementById('accStatusNum').style.display = "block";
+            }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                onValue(ref(db, 'users/' + user.uid + '/wallet'), snap => {
+                    userBalance = snap.val() || 0;
+                    document.getElementById('displayBalance').innerText = "RS. " + userBalance;
+                });
+                
+                loadUserHistoryAndStats(user.uid);
+                updateAccountUI();
+                watchForNotifications();
+            }
+        });
+
+        function loadUserHistoryAndStats(uid) {
+            onValue(query(ref(db, 'Requests/Deposits'), orderByChild('userId'), equalTo(uid)), snap => {
+                allDepositsData = [];
+                snap.forEach(c => {
+                    allDepositsData.push({ id: c.key, type: 'deposit', ...c.val() });
+                });
+                updateStatsAndRender();
+            });
+
+            onValue(query(ref(db, 'Requests/Withdrawals'), orderByChild('userId'), equalTo(uid)), snap => {
+                allWithdrawalsData = [];
+                snap.forEach(c => {
+                    allWithdrawalsData.push({ id: c.key, type: 'withdraw', ...c.val() });
+                });
+                updateStatsAndRender();
+            });
+        }
+
+        window.filterHistory = (type) => {
+            currentFilter = type;
+            document.getElementById('tabAll').classList.toggle('active', type === 'all');
+            document.getElementById('tabDeposit').classList.toggle('active', type === 'deposit');
+            document.getElementById('tabWithdraw').classList.toggle('active', type === 'withdraw');
+            renderHistoryList();
+        };
+
+        function updateStatsAndRender() {
+            const depCount = allDepositsData.length;
+            const witCount = allWithdrawalsData.length;
+            
+            let approvedCount = 0;
+            allDepositsData.forEach(d => { if(d.status === "Success" || d.status === "Successful") approvedCount++; });
+            allWithdrawalsData.forEach(w => { if(w.status === "Success" || w.status === "Successful") approvedCount++; });
+
+            document.getElementById('statDepositsCount').innerText = depCount;
+            document.getElementById('statWithdrawalsCount').innerText = witCount;
+            document.getElementById('statApprovedCount').innerText = approvedCount;
+
+            renderHistoryList();
+        }
+
+        function renderHistoryList() {
+            const listContainer = document.getElementById('unifiedHistoryList');
+            let combined = [];
+
+            if (currentFilter === 'all' || currentFilter === 'deposit') {
+                combined = combined.concat(allDepositsData);
+            }
+            if (currentFilter === 'all' || currentFilter === 'withdraw') {
+                combined = combined.concat(allWithdrawalsData);
+            }
+
+            combined.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            if (combined.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="empty-history-box">
+                        <i class="fas fa-receipt"></i>
+                        <p>No history</p>
+                    </div>`;
+                return;
+            }
+
+            listContainer.innerHTML = "";
+            combined.forEach(item => {
+                const isRejected = item.status === "Rejected";
+                let historyClass = "history-item";
+                if(isRejected) historyClass += " rejected-history";
+                let statusColor = isRejected ? "#e74c3c" : "var(--jazz-yellow)";
+                let reasonHtml = (isRejected && item.reason) ? `<br><span style="color:#ff6b6b; font-size:12px;">Reason: <b>${item.reason}</b></span>` : '';
+
+                if (item.type === 'deposit') {
+                    let ssHtml = item.screenshot ? `<img src="${item.screenshot}" class="history-ss" onclick="window.open(this.src, '_blank')">` : '';
+                    listContainer.innerHTML += `
+                        <div class="${historyClass}">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                <b>RS. ${item.amount}</b>
+                                <span style="background:rgba(245,166,35,0.15); color:var(--accent-yellow); font-size:10px; padding:2px 8px; border-radius:6px; font-weight:bold;">DEPOSIT (${item.method || 'JazzCash'})</span>
+                            </div>
+                            TID: ${item.tid}<br>
+                            Status: <span style="color:${statusColor}; font-weight:bold;">${item.status}</span>
+                            ${reasonHtml}
+                            ${ssHtml}
+                            <br><small style="color:#aaa;">${formatT(item.timestamp)}</small>
+                        </div>`;
+                } else {
+                    const uMethod = item.selectedMethod || item.method || 'Account';
+                    const uName = item.name || item.accountName || 'N/A';
+                    const uNum = item.num || item.number || 'N/A';
+
+                    listContainer.innerHTML += `
+                        <div class="${historyClass}">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                <b>RS. ${item.amount}</b>
+                                <span style="background:rgba(46,204,113,0.15); color:var(--ep-green); font-size:10px; padding:2px 8px; border-radius:6px; font-weight:bold;">WITHDRAW</span>
+                            </div>
+                            Method: <span style="color:var(--accent-yellow); text-transform:uppercase;">${uMethod}</span><br>
+                            Name: <b>${uName}</b><br>
+                            Number: <b style="color:#4ed1ff">${uNum}</b><br>
+                            Status: <span style="color:${statusColor}; font-weight:bold;">${item.status}</span>
+                            ${reasonHtml}
+                            <br><small style="color:#aaa;">${formatT(item.timestamp)}</small>
+                        </div>`;
+                }
+            });
+        }
+
+        async function sendToNotifications(type, amount, status) {
+            if(!currentUser) return;
+            const notifRef = ref(db, 'notifications/' + currentUser.uid);
+            await push(notifRef, {
+                title: type + " Updated",
+                message: `Your ${type} of RS. ${amount} is now ${status}.`,
+                time: serverTimestamp(),
+                read: false
+            });
+        }
+
+        function watchForNotifications() {
+            onValue(query(ref(db, 'Requests/Deposits'), orderByChild('userId'), equalTo(currentUser.uid)), snap => {
+                snap.forEach(child => {
+                    const data = child.val();
+                    if(data.status === "Success" || data.status === "Successful") {
+                        const notifiedKey = 'notif_dep_' + child.key;
+                        if(!localStorage.getItem(notifiedKey)) {
+                            sendToNotifications("Deposit", data.amount, data.status);
+                            localStorage.setItem(notifiedKey, 'true');
+                        }
+                    }
+                });
+            });
+
+            onValue(query(ref(db, 'Requests/Withdrawals'), orderByChild('userId'), equalTo(currentUser.uid)), snap => {
+                snap.forEach(child => {
+                    const data = child.val();
+                    if(data.status === "Success" || data.status === "Successful") {
+                        const notifiedKey = 'notif_wit_' + child.key;
+                        if(!localStorage.getItem(notifiedKey)) {
+                            sendToNotifications("Withdrawal", data.amount, data.status);
+                            localStorage.setItem(notifiedKey, 'true');
+                        }
+                    }
+                });
+            });
+        }
+
+        const showStatus = (msg, type) => {
+            const el = document.getElementById('depStatusMsg');
+            el.innerText = msg;
+            el.className = `feedback-msg msg-${type}`;
+            el.style.display = "block";
+            if(type === 'success') setTimeout(() => { el.style.display = "none"; }, 4000);
+        };
+
+        document.getElementById('btnDeposit').onclick = async () => {
+            const btn = document.getElementById('btnDeposit');
+            const amount = parseFloat(document.getElementById('depAmount').value);
+            const tid = document.getElementById('depTID').value.trim();
+            const file = document.getElementById('depFile').files[0];
+
+            if(!tid || !file) return alert("TID aur Screenshot dono lazmi hain!");
+
+            btn.disabled = true;
+
+            try {
+                const snap = await get(ref(db, 'Requests/Deposits'));
+                let isDuplicate = false;
+                
+                if(snap.exists()){
+                    const allDeposits = snap.val();
+                    isDuplicate = Object.values(allDeposits).some(d => d.tid === tid);
+                }
+
+                if(isDuplicate) {
+                    alert("This TID is already used by a user!");
+                    btn.disabled = false;
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    await push(ref(db, 'Requests/Deposits'), {
+                        userId: currentUser.uid, 
+                        method: selectedDepMethod, 
+                        amount, 
+                        tid, 
+                        screenshot: e.target.result, 
+                        status: "Pending", 
+                        timestamp: serverTimestamp()
+                    });
+                    
+                    alert("Deposit Successful! System verify kar raha hai.");
+                    document.getElementById('depAmount').value = "";
+                    document.getElementById('depTID').value = "";
+                    document.getElementById('depFile').value = "";
+                    selectedDepMethod = "";
+                    document.getElementById('depStep2').classList.remove('active-step');
+                    document.getElementById('depStep1').classList.add('active-step');
+                    hidePage('depositPage');
+                    btn.disabled = false;
+                };
+                reader.readAsDataURL(file);
+
+            } catch (err) {
+                alert("Error! Net check karein.");
+                btn.disabled = false;
+            }
+        };
+
+        document.getElementById('btnWithdraw').onclick = async () => {
+            const btn = document.getElementById('btnWithdraw');
+            const amount = parseFloat(document.getElementById('witAmount').value);
+            const saved = JSON.parse(localStorage.getItem('savedAcc'));
+            
+            if(!saved) return alert("Account details set karein!");
+            if(amount < 500) return alert("Min withdraw 500 RS!");
+            if(amount > userBalance) return alert("Balance kam hai!");
+
+            btn.disabled = true;
+
+            try {
+                const newWitRef = push(ref(db, 'Requests/Withdrawals'));
+                await set(newWitRef, {
+                    userId: currentUser.uid, amount, ...saved, status: "Pending", timestamp: serverTimestamp()
+                });
+                
+                const currentWalletSnap = await get(ref(db, 'users/' + currentUser.uid + '/wallet'));
+                const latestBalance = currentWalletSnap.exists() ? currentWalletSnap.val() : userBalance;
+                
+                await set(ref(db, 'users/' + currentUser.uid + '/wallet'), latestBalance - amount);
+                
+                const msgBox = document.getElementById('witSuccessMsg');
+                msgBox.style.display = "block";
+                
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3500);
+
+            } catch (error) {
+                alert("Error sending request!");
+                btn.disabled = false;
+            }
+        };
+
+        const formatT = (ts) => ts ? new Date(ts).toLocaleString() : "Wait...";
+    </script>
+</body>
+</html>
