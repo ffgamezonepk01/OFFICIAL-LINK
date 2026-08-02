@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>FF GameZone PK - Leaderboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root { 
+            --accent: #ffcc00; 
+            --accent-glow: rgba(255, 204, 0, 0.4);
+            --bg: #090b10; 
+            --card-bg: rgba(22, 27, 41, 0.85);
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        /* --- GLOBAL TAP EFFECT REMOVAL --- */
+        * { 
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; 
+            outline: none !important; 
+        }
+
+        body { 
+            background-color: var(--bg); 
+            background-image: radial-gradient(circle at 50% 0%, #161b29 0%, #090b10 70%);
+            color: #ffffff; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            text-align: center; 
+            padding: 90px 15px 120px 15px; 
+            overflow-x: hidden; 
+            min-height: 100vh;
+        }
+
+        /* --- LOADER STYLE --- */
+        #globalLoaderEl {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0C0C27; z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.4s ease;
+        }
+
+        /* --- FIXED HEADER --- */
+        .app-header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 75px;
+            background: rgba(9, 11, 16, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px; z-index: 1000;
+        }
+        
+        .header-title { 
+            display: flex; align-items: center; gap: 12px; 
+            font-weight: 900; font-size: 18px; letter-spacing: 0.8px; 
+            color: var(--accent); 
+        }
+        
+        .header-title i { 
+            color: var(--accent); 
+            font-size: 1.3rem; 
+            filter: drop-shadow(0 0 8px var(--accent-glow)); 
+        }
+        
+        .wallet-chip {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b); 
+            padding: 7px 16px; border-radius: 50px;
+            display: flex; align-items: center; gap: 8px; font-weight: 700;
+            font-size: 14px; color: white;
+            box-shadow: 0 4px 15px rgba(255, 65, 108, 0.35);
+        }
+
+        .wallet-chip i { font-size: 13px; }
+
+        /* --- HERO SECTION --- */
+        .top-hero-section {
+            margin: 15px 0 25px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .big-trophy {
+            font-size: 55px; 
+            color: var(--accent);
+            filter: drop-shadow(0 0 20px var(--accent-glow));
+            margin-bottom: 8px;
+            animation: cupBounce 2s infinite ease-in-out;
+        }
+        
+        @keyframes cupBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .top-player-text {
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: #38ef7d;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(56, 239, 125, 0.3);
+        }
+
+        /* --- PODIUM DESIGN --- */
+        .podium-container {
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-end;
+            margin: 35px auto 25px auto; 
+            max-width: 420px;
+            height: 270px;
+            padding: 0 5px;
+        }
+        
+        .podium-item { 
+            flex: 1; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 25px 8px 12px 8px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .rank-1 { order: 2; transform: scale(1.1); z-index: 3; margin-bottom: 20px; border-color: rgba(255, 215, 0, 0.3); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .rank-2 { order: 1; z-index: 2; margin-right: -8px; }
+        .rank-3 { order: 3; z-index: 1; margin-left: -8px; }
+
+        .crown { 
+            position: absolute; 
+            filter: drop-shadow(0 0 10px rgba(255,215,0,0.8)); 
+            animation: crownFloat 2s infinite ease-in-out;
+        }
+        .rank-1 .crown { font-size: 32px; top: -38px; } 
+        .rank-2 .crown { font-size: 24px; top: -28px; opacity: 0.85; } 
+        .rank-3 .crown { font-size: 20px; top: -25px; opacity: 0.7; } 
+
+        @keyframes crownFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .podium-img { 
+            width: 65px; height: 65px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            background: #161b29; 
+        }
+        .rank-1 .podium-img { width: 72px; height: 72px; border: 3px solid #FFD700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
+        .rank-2 .podium-img { border: 3px solid #C0C0C0; box-shadow: 0 0 10px rgba(192, 192, 192, 0.4); }
+        .rank-3 .podium-img { border: 3px solid #CD7F32; box-shadow: 0 0 10px rgba(205, 127, 50, 0.4); }
+
+        .podium-name { 
+            font-weight: 700; 
+            font-size: 13px; 
+            margin: 10px 0 6px 0; 
+            width: 100%; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            white-space: nowrap; 
+        }
+        
+        .podium-stats { 
+            font-size: 10px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 3px; 
+            font-weight: 600; 
+            margin-bottom: 8px;
+            width: 100%;
+        }
+        
+        .podium-stats .pod-stat { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 4px; 
+        }
+        .podium-stats .pod-stat.kills { color: #38ef7d; }
+        .podium-stats .pod-stat.points { color: var(--accent); }
+        
+        .rank-tag { 
+            font-size: 10px; 
+            font-weight: 800; 
+            padding: 2px 10px; 
+            border-radius: 12px; 
+            color: #000; 
+            text-transform: uppercase;
+        }
+
+        /* --- LIST ITEMS (Rank 4+) --- */
+        #leader-list {
+            max-width: 420px;
+            margin: 0 auto;
+        }
+
+        .leader-item { 
+            display: flex; 
+            align-items: center;
+            background: var(--card-bg); 
+            margin: 10px 0; 
+            padding: 12px 16px; 
+            border-radius: 16px; 
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(5px);
+            transition: transform 0.2s ease;
+        }
+        
+        .rank-number { 
+            font-weight: 800; 
+            width: 35px; 
+            color: #7f8c8d; 
+            font-size: 16px; 
+            text-align: left;
+        }
+        
+        .p-img-small { 
+            width: 48px; height: 48px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            border: 2px solid rgba(255, 255, 255, 0.15); 
+        }
+        
+        .p-info { 
+            flex-grow: 1; 
+            text-align: left; 
+            margin-left: 14px; 
+        }
+        
+        .p-name {
+            font-weight: 700;
+            font-size: 14px;
+            color: #ffffff;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 170px;
+        }
+
+        .p-stats { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            font-size: 11px; 
+        }
+        
+        .p-stat-box { 
+            display: flex; 
+            align-items: center; 
+            gap: 4px; 
+            font-weight: 600;
+        }
+        .p-stat-box.kills { color: #38ef7d; }
+        .p-stat-box.points { color: var(--accent); }
+        .p-stat-box i { font-size: 10px; }
+
+        /* --- BOTTOM NAV --- */
+        .bottom-nav {
+            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); 
+            width: 92%; max-width: 410px;
+            background: rgba(22, 27, 41, 0.95); 
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            display: flex; justify-content: space-around;
+            align-items: center; padding: 10px 5px; border-radius: 40px; 
+            border: 1px solid var(--border-color); z-index: 1000; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+        }
+        
+        .nav-item { 
+            display: flex; flex-direction: column; align-items: center; 
+            text-decoration: none !important; color: #7f8c8d; flex: 1; 
+            gap: 4px;
+        }
+        
+        .nav-item i { 
+            font-size: 18px; 
+            padding: 6px 16px; 
+            border-radius: 20px; 
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item span { 
+            font-size: 10px; 
+            font-weight: 700; 
+            text-transform: capitalize; 
+        }
+        
+        .nav-item.active { color: var(--accent) !important; }
+        
+        .nav-item.active i { 
+            background-color: var(--accent) !important; 
+            color: #000 !important; 
+            box-shadow: 0 0 15px var(--accent-glow); 
+        }
+
+        /* --- NO LEADERBOARD EMPTY STYLE --- */
+        .no-leaderboard-box {
+            background: var(--card-bg);
+            border: 1.5px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 45px 20px;
+            text-align: center;
+            max-width: 410px;
+            margin: 20px auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        
+        .no-leaderboard-box i {
+            font-size: 60px;
+            color: #555;
+            display: block;
+            margin-bottom: 15px;
+        }
+        
+        .no-leaderboard-box p {
+            font-size: 15px;
+            font-weight: 800;
+            color: #888;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="globalLoaderEl">
+        <iframe src="loading.html" style="width:100%; height:100%; border:none;"></iframe>
+    </div>
+
+    <header class="app-header">
+        <div class="header-title">
+            <i class="bi bi-trophy-fill"></i>
+            <span>Leaderboard</span>
+        </div>
+        <div class="wallet-chip">
+            <i class="fas fa-wallet"></i>
+            <span id="walletBalance">0.00</span>
+        </div>
+    </header>
+
+    <div class="top-hero-section">
+        <i class="bi bi-trophy-fill big-trophy"></i>
+        <div class="top-player-text">TOP PLAYERS</div>
+    </div>
+
+    <div class="podium-container" id="podium"></div>
+    <div id="leader-list"></div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="stile.html" class="nav-item">
+            <i class="fas fa-gamepad"></i>
+            <span>Tournaments</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item active">
+            <i class="fas fa-trophy"></i>
+            <span>Leaderboard</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user-circle"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <script>
+        function hideLoader() {
+            const loader = document.getElementById('globalLoaderEl');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; }, 300);
+            }
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyANjbQLKEpV0Mj5e5PJzCPZvFo8a5vzy_k",
+            authDomain: "ff-tournamint-323ac.firebaseapp.com",
+            databaseURL: "https://ff-tournamint-323ac-default-rtdb.firebaseio.com",
+            projectId: "ff-tournamint-323ac",
+            storageBucket: "ff-tournamint-323ac.firebasestorage.app",
+            appId: "1:157085748163:web:848536d10ae58d32398b76"
+        };
+        
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const database = firebase.database();
+
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                database.ref('users/' + user.uid + '/wallet').on('value', snap => {
+                    document.getElementById('walletBalance').innerText = parseFloat(snap.val() || 0).toFixed(2);
+                });
+            }
+        });
+
+        database.ref('Leaderboard').on('value', (snapshot) => {
+            const podiumDiv = document.getElementById('podium');
+            const listDiv = document.getElementById('leader-list');
+            podiumDiv.innerHTML = "";
+            listDiv.innerHTML = "";
+
+            if (!snapshot.exists() || snapshot.numChildren() === 0) {
+                podiumDiv.style.display = "none";
+                listDiv.innerHTML = `
+                    <div class="no-leaderboard-box">
+                        <i class="bi bi-trophy"></i>
+                        <p>No Leaderboard Available</p>
+                    </div>`;
+                hideLoader();
+                return;
+            }
+
+            podiumDiv.style.display = "flex";
+
+            let players = [];
+            snapshot.forEach((child) => { players.push(child.val()); });
+
+            players.sort((a, b) => parseInt(a.rank) - parseInt(b.rank));
+
+            players.forEach((val) => {
+                const rank = parseInt(val.rank);
+                const photo = val.photo || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+                const kills = val.kills || 0;
+                const points = val.points || 0;
+
+                if (rank <= 3) {
+                    podiumDiv.innerHTML += `
+                        <div class="podium-item rank-${rank}">
+                            <div class="crown">👑</div>
+                            <img class="podium-img" src="${photo}">
+                            <div class="podium-name">${val.name}</div>
+                            <div class="podium-stats">
+                                <div class="pod-stat kills"><i class="fas fa-crosshairs"></i> ${kills}</div>
+                                <div class="pod-stat points"><i class="fas fa-star"></i> ${points}</div>
+                            </div>
+                            <div class="rank-tag" style="background:${rank==1?'#FFD700':(rank==2?'#C0C0C0':'#CD7F32')}">#${rank}</div>
+                        </div>
+                    `;
+                } else {
+                    listDiv.innerHTML += `
+                        <div class="leader-item">
+                            <div class="rank-number">#${rank}</div>
+                            <img class="p-img-small" src="${photo}">
+                            <div class="p-info">
+                                <div class="p-name">${val.name}</div>
+                                <div class="p-stats">
+                                    <div class="p-stat-box kills"><i class="fas fa-crosshairs"></i> ${kills} Kills</div>
+                                    <div class="p-stat-box points"><i class="fas fa-star"></i> ${points} Pts</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            hideLoader();
+        });
+    </script>
+</body>
+</html>
